@@ -48,9 +48,9 @@ DB_NAME = os.getenv("DB_NAME", "social_scraper")
 INSTAGRAM_COOKIE_FILE = "insta_cookies.json"
 CHECKPOINT_DIR = "checkpoints"
 LOG_DIR = "logs"
-TELEGRAM_API_ID = int(os.getenv("TELEGRAM_API_ID", "25178035"))
-TELEGRAM_API_HASH = os.getenv("TELEGRAM_API_HASH", "04892392fbd98c931c1091309a96b026")
-TELEGRAM_PHONE = os.getenv("TELEGRAM_PHONE", "+919372867657")
+TELEGRAM_API_ID = int(os.getenv("TELEGRAM_API_ID", ""))
+TELEGRAM_API_HASH = os.getenv("TELEGRAM_API_HASH", "")
+TELEGRAM_PHONE = os.getenv("TELEGRAM_PHONE", "")
 
 os.makedirs(CHECKPOINT_DIR, exist_ok=True)
 os.makedirs(LOG_DIR, exist_ok=True)
@@ -638,4 +638,5 @@ async def main():
             print(json.dumps({"saved": 0, "error": str(e)}))
 
 if __name__ == "__main__":
+
     asyncio.run(main())
