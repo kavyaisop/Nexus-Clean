@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Track User - Nexus Clean</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    />
+    <style>
+      /* Reuse styles from ScanHistory.html */
+      :root {
+        --bg-primary: #0f1419;
+        --bg-secondary: #1a2332;
+        --bg-card: #243447;
+        --bg-accent: #2d4059;
+        --text-primary: #ffffff;
+        --text-secondary: #e2e8f0;
+        --accent-1: #00bcd4;
+        --accent-2: #4fc3f7;
+        --accent-3: #ff7043;
+        --border-color: #334155;
+        --shadow: rgba(0, 0, 0, 0.3);
+        --glow: rgba(0, 188, 212, 0.3);
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        transition: all 0.3s ease;
+      }
+
+      body {
+        background: var(--bg-primary);
+        font-family: "Inter", sans-serif;
+        color: var(--text-primary);
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+      }
+
+      nav {
+        width: 100%;
+        background: var(--bg-secondary);
+        padding: 15px 30px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 2px 10px var(--shadow);
+        border-bottom: 1px solid var(--border-color);
+      }
+
+      nav h1 {
+        font-size: 1.8rem;
+        color: var(--text-primary);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-weight: 600;
+      }
+
+      .nav-links {
+        list-style: none;
+        display: flex;
+        gap: 30px;
+        align-items: center;
+      }
+
+      .nav-links li a {
+        text-decoration: none;
+        font-weight: 500;
+        color: var(--text-secondary);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        border-radius: 6px;
+        font-size: 0.95rem;
+      }
+
+      .nav-links li a:hover {
+        color: var(--accent-1);
+        background: rgba(255, 255, 255, 0.05);
+      }
+
+      .nav-links li a.active {
+        color: var(--accent-1);
+        background: rgba(255, 255, 255, 0.05);
+      }
+
+      .main {
+        flex: 1;
+        padding: 40px 30px;
+        max-width: 1400px;
+        margin: 0 auto;
+        width: 100%;
+      }
+
+      .header {
+        margin-bottom: 40px;
+      }
+
+      .header h1 {
+        font-size: 3rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 15px;
+      }
+
+      .header p {
+        font-size: 1.1rem;
+        color: var(--text-secondary);
+        max-width: 700px;
+        line-height: 1.6;
+      }
+
+      .flagged-users-list {
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+      }
+
+      .flagged-user-item {
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 25px;
+        box-shadow: 0 2px 8px var(--shadow);
+      }
+
+      .flagged-user-item:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 4px 20px rgba(0, 188, 212, 0.15);
+      }
+
+      .flagged-user-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+        font-size: 0.9rem;
+      }
+
+      .flagged-user-username {
+        font-weight: 600;
+        color: var(--accent-1);
+      }
+
+      .flagged-user-platform {
+        background: var(--bg-secondary);
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-size: 0.8rem;
+      }
+
+      .flagged-user-info {
+        color: var(--text-primary);
+        line-height: 1.4;
+        margin-bottom: 8px;
+        font-size: 0.9rem;
+      }
+
+      .flagged-user-meta {
+        font-size: 0.8rem;
+        color: var(--text-secondary);
+      }
+
+      .flagged-user-empty {
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+        text-align: center;
+        padding: 60px 30px;
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+      }
+
+      .flagged-user-error {
+        color: var(--accent-3);
+        font-size: 0.9rem;
+        text-align: center;
+        padding: 60px 30px;
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+      }
+
+      .toast {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-size: 0.95rem;
+        display: none;
+        color: var(--text-primary);
+        z-index: 1000;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      }
+
+      .toast.success { background: var(--accent-1); }
+      .toast.error { background: #ef4444; }
+
+      footer {
+        background: var(--bg-secondary);
+        text-align: center;
+        padding: 25px;
+        font-size: 0.9rem;
+        border-top: 1px solid var(--border-color);
+        color: var(--text-secondary);
+      }
+
+      @media (max-width: 768px) {
+        .main { padding: 30px 20px; }
+        nav { padding: 15px 20px; flex-direction: column; gap: 15px; }
+        .nav-links { gap: 20px; flex-wrap: wrap; justify-content: center; }
+        .header h1 { font-size: 2.2rem; }
+      }
+    </style>
+  </head>
+  <body>
+    <nav>
+      <h1>
+        <i class="fas fa-shield-alt"></i>
+        Nexus Clean
+      </h1>
+      <ul class="nav-links">
+        <li><a href="/dashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+        <li><a href="/livescan"><i class="fas fa-search"></i> Live Scan</a></li>
+        <li><a href="/scanhistory"><i class="fas fa-chart-line"></i> Scan History</a></li>
+        <li><a href="/trackuser" class="active"><i class="fas fa-location-dot"></i> Track User</a></li>
+        <li><a href="/aboutus"><i class="fas fa-info-circle"></i> About Us</a></li>
+        <li><a href="#" id="logout-link"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+      </ul>
+    </nav>
+
+    <div class="main">
+      <div class="header">
+        <h1>Track Flagged Users</h1>
+        <p>Monitor and review flagged users with their OSINT-derived location data.</p>
+      </div>
+
+      <div class="flagged-users-list" id="flagged-users-list">
+        <div class="flagged-user-empty">
+          <i class="fas fa-spinner fa-spin"></i> Loading flagged users...
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      © 2025 Nexus Clean - Drug Detection Dashboard. Advanced AI-Powered Social Media Monitoring System. All rights reserved.
+    </footer>
+
+    <div id="toast" class="toast"></div>
+
+    <script>
+      if (!localStorage.getItem('jwt')) {
+        window.location.href = '/';
+      }
+
+      async function api(url, options = {}) {
+        const token = localStorage.getItem('jwt');
+        const headers = {
+          ...options.headers,
+          Authorization: `Bearer ${token}`
+        };
+        const res = await fetch(url, { ...options, headers });
+        if (res.status === 401) {
+          localStorage.removeItem('jwt');
+          window.location.href = '/';
+        }
+        return res;
+      }
+
+      function showToast(message, type = 'success') {
+        const toast = document.getElementById("toast");
+        toast.textContent = message;
+        toast.className = `toast ${type}`;
+        toast.style.display = "block";
+        setTimeout(() => (toast.style.display = "none"), 3000);
+      }
+
+      async function fetchFlaggedUsers() {
+        try {
+          const response = await api('/api/osint/flagged_users');
+          if (!response.ok) throw new Error(await response.text());
+          const data = await response.json();
+          const userList = document.getElementById('flagged-users-list');
+
+          if (!data.users || data.users.length === 0) {
+            userList.innerHTML = '<div class="flagged-user-empty">No flagged users found.</div>';
+            return;
+          }
+
+          let html = '';
+          data.users.forEach(user => {
+            const location = user.osint_data && user.osint_data.location
+              ? `${user.osint_data.location.city || 'Unknown'}, ${user.osint_data.location.state || 'Unknown'}, ${user.osint_data.location.country || 'Unknown'}`
+              : 'No location data available';
+            html += `
+              <div class="flagged-user-item">
+                <div class="flagged-user-header">
+                  <span class="flagged-user-username">@${user.username}</span>
+                  <span class="flagged-user-platform">${user.platform}</span>
+                </div>
+                <div class="flagged-user-info">Location: ${location}</div>
+                <div class="flagged-user-meta">Flagged: ${new Date(user.flagged_at).toLocaleString()}</div>
+              </div>
+            `;
+          });
+          userList.innerHTML = html;
+        } catch (error) {
+          console.error('Error fetching flagged users:', error);
+          document.getElementById('flagged-users-list').innerHTML = `<div class="flagged-user-error">Error: ${error.message}</div>`;
+          showToast('Failed to load flagged users', 'error');
+        }
+      }
+
+      document.getElementById("logout-link").addEventListener("click", (e) => {
+        e.preventDefault();
+        localStorage.removeItem('jwt');
+        window.location.href = '/';
+      });
+
+      document.addEventListener("DOMContentLoaded", () => {
+        fetchFlaggedUsers();
+      });
+    </script>
+  </body>
+</html>

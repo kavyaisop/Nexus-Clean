@@ -1,0 +1,1535 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Scan History - Nexus Clean</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+      /* Root Variables */
+      :root {
+        --bg-primary: #0f1419;
+        --bg-secondary: #1a2332;
+        --bg-card: #243447;
+        --bg-accent: #2d4059;
+        --text-primary: #ffffff;
+        --text-secondary: #e2e8f0;
+        --accent-1: #00bcd4;
+        --accent-2: #4fc3f7;
+        --accent-3: #ff7043;
+        --border-color: #334155;
+        --shadow: rgba(0, 0, 0, 0.3);
+        --glow: rgba(0, 188, 212, 0.3);
+      }
+
+      /* Global Reset */
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        transition: all 0.3s ease;
+      }
+
+      body {
+        background: var(--bg-primary);
+        font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: var(--text-primary);
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+        overflow-x: hidden;
+      }
+
+      /* Navigation Bar */
+      nav {
+        width: 100%;
+        background: var(--bg-secondary);
+        padding: 15px 30px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 2px 10px var(--shadow);
+        border-bottom: 1px solid var(--border-color);
+      }
+
+      nav h1 {
+        font-size: 1.8rem;
+        color: var(--text-primary);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-weight: 600;
+      }
+
+      .nav-links {
+        list-style: none;
+        display: flex;
+        gap: 30px;
+        gap: 30px;
+        align-items: center;
+      }
+
+      .nav-links li a {
+        text-decoration: none;
+        font-weight: 500;
+        color: var(--text-secondary);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        border-radius: 6px;
+        font-size: 0.95rem;
+      }
+
+      .nav-links li a:hover {
+        color: var(--accent-1);
+        background: rgba(255, 255, 255, 0.05);
+      }
+
+      .nav-links li a.active {
+        color: var(--accent-1);
+        background: rgba(255, 255, 255, 0.05);
+      }
+
+      /* Main Content */
+      .main {
+        flex: 1;
+        padding: 40px 30px;
+        max-width: 1400px;
+        margin: 0 auto;
+        width: 100%;
+      }
+
+      .header {
+        margin-bottom: 40px;
+      }
+
+      .header h1 {
+        font-size: 3rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 15px;
+      }
+
+      .header p {
+        font-size: 1.1rem;
+        color: var(--text-secondary);
+        max-width: 700px;
+        line-height: 1.6;
+      }
+
+      /* Stats Grid */
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 25px;
+        margin-bottom: 40px;
+      }
+
+      .stat-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 25px;
+        box-shadow: 0 2px 8px var(--shadow);
+      }
+
+      .stat-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 4px 20px rgba(0, 188, 212, 0.15);
+      }
+
+      .stat-content {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .stat-text h3 {
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+        font-weight: 500;
+        margin-bottom: 8px;
+      }
+
+      .stat-value {
+        font-size: 2.2rem;
+        font-weight: 700;
+        color: var(--text-primary);
+      }
+
+      .stat-value.threats { color: #ef4444; }
+      .stat-value.messages { color: var(--accent-2); }
+      .stat-value.success { color: #10b981; }
+
+      .stat-icon {
+        width: 50px;
+        height: 50px;
+        background: var(--bg-accent);
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .stat-icon i { font-size: 1.5rem; }
+
+      /* Filters Card */
+      .filters-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 25px;
+        margin-bottom: 30px;
+        box-shadow: 0 2px 8px var(--shadow);
+      }
+
+      .filters-row {
+        display: flex;
+        gap: 20px;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+
+      .search-container {
+        flex: 1;
+        min-width: 300px;
+        position: relative;
+      }
+
+      .search-input {
+        width: 100%;
+        padding: 12px 16px 12px 45px;
+        background: var(--bg-accent);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        color: var(--text-primary);
+        font-family: inherit;
+        font-size: 0.95rem;
+      }
+
+      .search-input:focus {
+        outline: none;
+        border-color: var(--accent-1);
+        box-shadow: 0 0 0 3px rgba(0, 188, 212, 0.1);
+      }
+
+      .search-input::placeholder {
+        color: rgba(226, 232, 240, 0.6);
+      }
+
+      .search-icon {
+        position: absolute;
+        left: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-secondary);
+      }
+
+      .filter-select {
+        padding: 12px 16px;
+        background: var(--bg-accent);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        color: var(--text-primary);
+        font-family: inherit;
+        font-size: 0.95rem;
+        min-width: 140px;
+        cursor: pointer;
+      }
+
+      .filter-select:focus {
+        outline: none;
+        border-color: var(--accent-1);
+      }
+
+      .btn {
+        padding: 12px 20px;
+        background: var(--bg-accent);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        color: var(--text-primary);
+        font-family: inherit;
+        font-weight: 500;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        text-decoration: none;
+      }
+
+      .btn:hover {
+        background: var(--bg-card);
+        border-color: var(--accent-1);
+      }
+
+      .btn-danger {
+        background: #ef4444;
+        color: var(--text-primary);
+        border: none;
+      }
+
+      .btn-danger:hover {
+        background: #dc2626;
+        border: none;
+      }
+
+      .btn-flag-user {
+        background: var(--accent-2);
+        color: white;
+        border: none;
+        padding: 6px 12px;
+        font-size: 0.8rem;
+      }
+
+      .btn-flag-user:hover {
+        background: #42a5f5;
+      }
+
+      /* History List */
+      .history-list {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+      }
+
+      .history-item {
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 25px;
+        box-shadow: 0 2px 8px var(--shadow);
+      }
+
+      .history-item:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 4px 20px rgba(0, 188, 212, 0.15);
+      }
+
+      .item-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+        gap: 15px;
+      }
+
+      .item-info {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .status-icon {
+        width: 20px;
+        height: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .status-icon.completed { color: #10b981; }
+      .status-icon.failed { color: #ef4444; }
+      .status-icon.running { color: #eab308; }
+
+      .item-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: var(--text-primary);
+      }
+
+      .item-subtitle {
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+      }
+
+      .platform-instagram { color: var(--accent-1); }
+      .platform-telegram { color: var(--accent-2); }
+      .platform-whatsapp { color: var(--accent-3); }
+
+      .item-badges {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+
+      .badge {
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+      }
+
+      .badge-critical { background: #ef4444; color: white; }
+      .badge-high { background: #f59e0b; color: white; }
+      .badge-medium { background: #eab308; color: white; }
+      .badge-low { background: #10b981; color: white; }
+      .badge-none { background: var(--border-color); color: var(--text-secondary); }
+      .badge-time { background: var(--bg-accent); color: var(--text-secondary); border: 1px solid var(--border-color); }
+
+      .item-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 15px;
+        margin-bottom: 20px;
+      }
+
+      .mini-stat {
+        background: var(--bg-accent);
+        border-radius: 8px;
+        padding: 15px;
+        text-align: center;
+      }
+
+      .mini-stat-value {
+        font-size: 1.2rem;
+        font-weight: 700;
+        margin-bottom: 4px;
+      }
+
+      .mini-stat-value.threats { color: #ef4444; }
+      .mini-stat-value.suspicious { color: #eab308; }
+      .mini-stat-value.clean { color: #10b981; }
+      .mini-stat-value.total { color: var(--accent-1); }
+
+      .mini-stat-label {
+        color: var(--text-secondary);
+        font-size: 0.75rem;
+      }
+
+      .item-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 15px;
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+      }
+
+      .item-actions {
+        display: flex;
+        gap: 10px;
+      }
+
+      .btn-sm {
+        padding: 6px 12px;
+        font-size: 0.8rem;
+      }
+
+      .empty-state {
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 60px 30px;
+        text-align: center;
+        box-shadow: 0 2px 8px var(--shadow);
+      }
+
+      .empty-state i {
+        font-size: 4rem;
+        color: rgba(226, 232, 240, 0.3);
+        margin-bottom: 20px;
+        display: block;
+      }
+
+      .empty-state h3 {
+        font-size: 1.3rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 10px;
+      }
+
+      .empty-state p {
+        color: var(--text-secondary);
+      }
+
+      .toast {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-size: 0.95rem;
+        display: none;
+        color: var(--text-primary);
+        z-index: 1000;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      }
+
+      .toast.success { background: var(--accent-1); }
+      .toast.error { background: #ef4444; }
+
+      /* Modal Styles */
+      .modal {
+        display: none;
+        position: fixed;
+        z-index: 1001;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        animation: fadeIn 0.3s ease;
+      }
+
+      .modal-content {
+        background-color: var(--bg-card);
+        margin: 5% auto;
+        padding: 0;
+        border-radius: 12px;
+        width: 90%;
+        max-width: 800px;
+        max-height: 80vh;
+        overflow-y: auto;
+        box-shadow: 0 10px 30px var(--shadow);
+      }
+
+      .modal-header {
+        padding: 20px;
+        border-bottom: 1px solid var(--border-color);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .modal-header h2 {
+        margin: 0;
+        color: var(--text-primary);
+      }
+
+      .close {
+        color: var(--text-secondary);
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+        padding: 0 10px;
+      }
+
+      .close:hover {
+        color: var(--accent-1);
+      }
+
+      .modal-body {
+        padding: 20px;
+        max-height: 60vh;
+        overflow-y: auto;
+      }
+
+      .message-list {
+        list-style: none;
+      }
+
+      .message-item {
+        background: var(--bg-accent);
+        margin-bottom: 15px;
+        padding: 15px;
+        border-radius: 8px;
+        border-left: 4px solid #ef4444;
+        display: flex;
+        align-items: flex-start;
+        gap: 10px;
+      }
+
+      .message-checkbox-container {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-top: 5px;
+      }
+
+      .message-checkbox {
+        margin: 0;
+      }
+
+      .message-content {
+        flex: 1;
+      }
+
+      .message-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+        font-size: 0.9rem;
+      }
+
+      .message-sender {
+        font-weight: 600;
+        color: var(--accent-1);
+      }
+
+      .message-platform {
+        background: var(--bg-secondary);
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-size: 0.8rem;
+      }
+
+      .message-text {
+        color: var(--text-primary);
+        line-height: 1.4;
+        margin-bottom: 8px;
+      }
+
+      .message-meta {
+        font-size: 0.8rem;
+        color: var(--text-secondary);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .message-prob {
+        background: #ef4444;
+        color: white;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-weight: 500;
+      }
+
+      .review-actions {
+        margin-top: 10px;
+        display: flex;
+        gap: 8px;
+      }
+
+      .btn-review-threat {
+        background: #10b981 !important;
+        color: white;
+      }
+
+      .btn-review-clean {
+        background: #6b7280 !important;
+        color: white;
+      }
+
+      /* Flagged Users Modal */
+      .flagged-users-list {
+        list-style: none;
+      }
+
+      .flagged-user-item {
+        background: var(--bg-accent);
+        margin-bottom: 15px;
+        padding: 15px;
+        border-radius: 8px;
+        border-left: 4px solid var(--accent-1);
+      }
+
+      .flagged-user-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+        font-size: 0.9rem;
+      }
+
+      .flagged-user-id {
+        font-weight: 600;
+        color: var(--accent-1);
+      }
+
+      .flagged-user-platform {
+        background: var(--bg-secondary);
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-size: 0.8rem;
+      }
+
+      .flagged-user-info {
+        color: var(--text-primary);
+        line-height: 1.4;
+        margin-bottom: 8px;
+        font-size: 0.9rem;
+      }
+
+      .flagged-user-meta {
+        font-size: 0.8rem;
+        color: var(--text-secondary);
+      }
+
+      .flagged-user-error {
+        color: var(--accent-3);
+        font-size: 0.9rem;
+        text-align: center;
+      }
+
+      .flagged-user-empty {
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+        text-align: center;
+      }
+
+      /* Export Modal */
+      .export-modal-content {
+        background-color: var(--bg-card);
+        margin: 15% auto;
+        padding: 20px;
+        border-radius: 12px;
+        width: 90%;
+        max-width: 500px;
+        box-shadow: 0 10px 30px var(--shadow);
+      }
+
+      .export-options {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+      }
+
+      .export-option {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px;
+        background: var(--bg-accent);
+        border-radius: 8px;
+        border: 1px solid var(--border-color);
+      }
+
+      .export-option button {
+        background: var(--accent-1);
+        color: var(--text-primary);
+        border: none;
+      }
+
+      .export-option button:hover {
+        background: #00a3b9;
+      }
+
+      /* Confirmation Modal */
+      .confirm-modal-content {
+        background-color: var(--bg-card);
+        margin: 15% auto;
+        padding: 20px;
+        border-radius: 12px;
+        width: 90%;
+        max-width: 400px;
+        box-shadow: 0 10px 30px var(--shadow);
+      }
+
+      .confirm-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        margin-top: 20px;
+      }
+
+      /* Animations */
+      @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+      }
+
+      @keyframes slideIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+
+      .animate-in {
+        animation: slideIn 0.6s ease-out;
+      }
+
+      .hidden {
+        display: none;
+      }
+
+      /* Footer */
+      footer {
+        background: var(--bg-secondary);
+        text-align: center;
+        padding: 25px;
+        font-size: 0.9rem;
+        border-top: 1px solid var(--border-color);
+        color: var(--text-secondary);
+      }
+
+      /* Responsive Design */
+      @media (max-width: 768px) {
+        .main { padding: 30px 20px; }
+        nav { padding: 15px 20px; flex-direction: column; gap: 15px; }
+        .nav-links { gap: 20px; flex-wrap: wrap; justify-content: center; }
+        .header h1 { font-size: 2.2rem; }
+        .filters-row { flex-direction: column; align-items: stretch; }
+        .search-container { min-width: unset; }
+        .item-header { flex-direction: column; align-items: flex-start; }
+        .item-stats { grid-template-columns: repeat(2, 1fr); }
+        .item-footer { flex-direction: column; align-items: flex-start; }
+        .modal-content { width: 95%; margin: 10% auto; }
+        .message-checkbox-container { flex-direction: column; align-items: flex-start; gap: 5px; }
+      }
+    </style>
+  </head>
+  <body class="animate-in">
+    <!-- Navigation -->
+    <nav>
+      <h1>
+        <i class="fas fa-shield-alt"></i>
+        Nexus Clean
+      </h1>
+      <ul class="nav-links">
+        <li><a href="/dashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+        <li><a href="/livescan"><i class="fas fa-search"></i> Live Scan</a></li>
+        <li><a href="/scanhistory" class="active"><i class="fas fa-chart-line"></i> Scan History</a></li>
+        <li><a href="/trackuser"><i class="fas fa-location-dot"></i> Track User</a></li>
+        <li><a href="/aboutus"><i class="fas fa-info-circle"></i> About Us</a></li>
+        <li><a href="#" id="logout-link"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+      </ul>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="main">
+      <div class="header">
+        <h1>Scan History</h1>
+        <p>Review, analyze, and manage your previous drug detection scans across different platforms.</p>
+      </div>
+
+      <!-- Stats Grid -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-content">
+            <div class="stat-text">
+              <h3>Total Scans</h3>
+              <div class="stat-value" id="total-scans">0</div>
+            </div>
+            <div class="stat-icon">
+              <i class="fas fa-search" style="color: var(--accent-1)"></i>
+            </div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-content">
+            <div class="stat-text">
+              <h3>Threats Found</h3>
+              <div class="stat-value threats" id="total-threats">0</div>
+            </div>
+            <div class="stat-icon">
+              <i class="fas fa-exclamation-triangle" style="color: #ef4444"></i>
+            </div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-content">
+            <div class="stat-text">
+              <h3>Messages Analyzed</h3>
+              <div class="stat-value messages" id="total-messages">0</div>
+            </div>
+            <div class="stat-icon">
+              <i class="fas fa-eye" style="color: var(--accent-2)"></i>
+            </div>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-content">
+            <div class="stat-text">
+              <h3>Success Rate</h3>
+              <div class="stat-value success" id="success-rate">0%</div>
+            </div>
+            <div class="stat-icon">
+              <i class="fas fa-check-circle" style="color: #10b981"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Filters -->
+      <div class="filters-card">
+        <div class="filters-row">
+          <div class="search-container">
+            <i class="fas fa-search search-icon"></i>
+            <input
+              type="text"
+              class="search-input"
+              placeholder="Search by target, platform, or scan type..."
+              id="search-input"
+              onkeyup="filterResults()"
+            />
+          </div>
+          <select class="filter-select" id="platform-filter" onchange="filterResults()">
+            <option value="all">All Platforms</option>
+            <option value="instagram">Instagram</option>
+            <option value="telegram">Telegram</option>
+            <option value="whatsapp">WhatsApp</option>
+          </select>
+          <select class="filter-select" id="status-filter" onchange="filterResults()">
+            <option value="all">All Status</option>
+            <option value="completed">Completed</option>
+            <option value="failed">Failed</option>
+            <option value="running">Running</option>
+          </select>
+          <button class="btn" onclick="openExportModal('all')">
+            <i class="fas fa-download"></i> Export
+          </button>
+        </div>
+      </div>
+
+      <!-- History List -->
+      <div class="history-list" id="history-list"></div>
+
+      <!-- Empty State -->
+      <div class="empty-state hidden" id="empty-state">
+        <i class="fas fa-search"></i>
+        <h3>No scans found</h3>
+        <p>Try adjusting your search criteria or filters.</p>
+      </div>
+    </div>
+
+    <!-- Threats Modal -->
+    <div id="details-modal" class="modal"></div>
+
+    <!-- Export Modal -->
+    <div id="export-modal" class="modal">
+      <div class="export-modal-content">
+        <div class="modal-header">
+          <h2>Export Scan Data</h2>
+          <span class="close" onclick="closeExportModal()">&times;</span>
+        </div>
+        <div class="modal-body">
+          <div class="export-options">
+            <div class="export-option">
+              <span>JSON Format</span>
+              <button class="btn btn-sm" onclick="exportData('json')">Export</button>
+            </div>
+            <div class="export-option">
+              <span>CSV Format</span>
+              <button class="btn btn-sm" onclick="exportData('csv')">Export</button>
+            </div>
+            <div class="export-option">
+              <span>PDF Format</span>
+              <button class="btn btn-sm" onclick="exportData('pdf')">Export</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="confirm-modal" class="modal">
+      <div class="confirm-modal-content">
+        <div class="modal-header">
+          <h2>Confirm Delete</h2>
+          <span class="close" onclick="closeConfirmModal()">&times;</span>
+        </div>
+        <div class="modal-body">
+          <p>Are you sure you want to delete this scan? This action cannot be undone.</p>
+        </div>
+        <div class="confirm-actions">
+          <button class="btn btn-sm" onclick="closeConfirmModal()">Cancel</button>
+          <button class="btn btn-sm btn-danger" id="confirm-delete-btn">Delete</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+      © 2025 Nexus Clean - Drug Detection Dashboard. Advanced AI-Powered Social Media Monitoring System. All rights reserved.
+    </footer>
+
+    <!-- Toast -->
+    <div id="toast" class="toast"></div>
+
+    <script>
+      if (!localStorage.getItem('jwt')) {
+        window.location.href = '/';
+      }
+
+      async function api(url, options = {}) {
+        const token = localStorage.getItem('jwt');
+        const headers = {
+          ...options.headers,
+          Authorization: `Bearer ${token}`
+        };
+        const res = await fetch(url, { ...options, headers });
+        if (res.status === 401) {
+          localStorage.removeItem('jwt');
+          window.location.href = '/';
+        }
+        return res;
+      }
+
+      let scanHistory = [];
+      let filteredHistory = [];
+      let pollInterval = null;
+      let exportScanId = null;
+      let deleteScanId = null;
+
+      function showToast(message, type = 'success') {
+        const toast = document.getElementById("toast");
+        toast.textContent = message;
+        toast.className = `toast ${type}`;
+        toast.style.display = "block";
+        setTimeout(() => (toast.style.display = "none"), 3000);
+      }
+
+      function openModal(title, messages, isReview = false) {
+        if (messages.length === 0) {
+          showToast("No messages found in this scan.", "error");
+          return;
+        }
+
+        let html = `
+          <div class="modal-content">
+            <div class="modal-header">
+              <h2>${title} <span style="color: #ef4444; font-size: 1.2rem;">(${messages.length})</span></h2>
+              <span class="close" onclick="closeModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+              <ul class="message-list">
+        `;
+
+        messages.forEach((msg, index) => {
+          const prob = (msg.probability * 100).toFixed(1);
+          const flagButton = msg.sender
+            ? `<button class="btn btn-sm btn-flag-user" onclick="flagUser('${msg.sender}', '${msg.platform}')"><i class="fas fa-flag"></i> Flag @${msg.sender}</button>`
+            : '<span style="color:#aaa;font-size:0.8rem;">No username available</span>';
+
+          let reviewButtons = '';
+          if (isReview && msg.id) {
+            reviewButtons = `
+              <div class="review-actions">
+                <button class="btn btn-sm btn-review-threat" onclick="reviewMessage('${msg.id}', 'threat', ${index})">
+                  <i class="fas fa-thumbs-up"></i> Threat
+                </button>
+                <button class="btn btn-sm btn-review-clean" onclick="reviewMessage('${msg.id}', 'clean', ${index})">
+                  <i class="fas fa-thumbs-down"></i> Clean
+                </button>
+              </div>
+            `;
+          } else if (isReview) {
+            reviewButtons = '<div class="review-actions"><em style="color:#aaa;">Review not available (missing ID)</em></div>';
+          }
+
+          html += `
+            <li class="message-item">
+              <div class="message-checkbox-container">
+                <input type="checkbox" class="message-checkbox" id="msg-${msg.id || index}" data-id="${msg.id || ''}">
+                ${flagButton}
+              </div>
+              <div class="message-content">
+                <div class="message-header">
+                  <span class="message-sender">${msg.sender || 'Unknown'} ${msg.sender_id ? `<small style="color:#aaa;">(${msg.sender_id})</small>` : ''}</span>
+                  <span class="message-platform">${msg.platform || 'Unknown'}</span>
+                </div>
+                <div class="message-text">${msg.message}</div>
+                <div class="message-meta">
+                  <span>${new Date(msg.timestamp).toLocaleString()}</span>
+                  <span class="message-prob">Prob: ${prob}%</span>
+                </div>
+                ${reviewButtons}
+              </div>
+            </li>
+          `;
+        });
+
+        html += `
+              </ul>
+            </div>
+          </div>
+        `;
+
+        const modal = document.getElementById('details-modal');
+        modal.innerHTML = html;
+        modal.style.display = 'block';
+        modal.onclick = function(event) {
+          if (event.target === modal) closeModal();
+        };
+      }
+
+      function closeModal() {
+        document.getElementById('details-modal').style.display = 'none';
+        document.getElementById('details-modal').onclick = null;
+      }
+
+      async function flagUser(username, platform) {
+        if (!username) {
+          showToast("No username provided for flagging", "error");
+          return;
+        }
+
+        try {
+          const response = await api('/api/flag_user', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, platform })
+          });
+
+          if (!response.ok) throw new Error(await response.text());
+          showToast(`User @${username} flagged successfully`, "success");
+        } catch (error) {
+          console.error('Flagging error:', error);
+          showToast(`Failed to flag user: ${error.message}`, 'error');
+        }
+      }
+
+      function openExportModal() {
+        exportScanId = 'all';
+        document.getElementById('export-modal').style.display = 'block';
+      }
+
+      function closeExportModal() {
+        document.getElementById('export-modal').style.display = 'none';
+        exportScanId = null;
+      }
+
+      function openConfirmModal(scanId) {
+        deleteScanId = scanId;
+        document.getElementById('confirm-modal').style.display = 'block';
+        const deleteBtn = document.getElementById('confirm-delete-btn');
+        deleteBtn.onclick = () => confirmDelete();
+      }
+
+      function closeConfirmModal() {
+        document.getElementById('confirm-modal').style.display = 'none';
+        deleteScanId = null;
+      }
+
+      function getRiskBadge(riskLevel, threatsDetected) {
+        if (riskLevel === "critical" || (threatsDetected && threatsDetected >= 10)) {
+          return '<div class="badge badge-critical">Critical</div>';
+        } else if (riskLevel === "high" || (threatsDetected && threatsDetected >= 3)) {
+          return '<div class="badge badge-high">High</div>';
+        } else if (riskLevel === "medium" || (threatsDetected && threatsDetected >= 1)) {
+          return '<div class="badge badge-medium">Medium</div>';
+        } else if (riskLevel === "low") {
+          return '<div class="badge badge-low">Low</div>';
+        } else {
+          return '<div class="badge badge-none">None</div>';
+        }
+      }
+
+      function getStatusIcon(status) {
+        switch (status) {
+          case "completed": return '<i class="fas fa-check-circle"></i>';
+          case "failed": return '<i class="fas fa-exclamation-triangle"></i>';
+          case "running": return '<i class="fas fa-clock"></i>';
+          default: return '<i class="fas fa-clock"></i>';
+        }
+      }
+
+      function getPlatformColor(platform) {
+        switch (platform) {
+          case "instagram": return "platform-instagram";
+          case "telegram": return "platform-telegram";
+          case "whatsapp": return "platform-whatsapp";
+          default: return "";
+        }
+      }
+
+      function formatDate(timestamp) {
+        return new Date(timestamp).toLocaleString();
+      }
+
+      function getTimeAgo(timestamp) {
+        const now = new Date();
+        const scanTime = new Date(timestamp);
+        const diffInMinutes = Math.floor((now - scanTime) / (1000 * 60));
+        if (diffInMinutes < 60) return `${diffInMinutes}m ago`;
+        else if (diffInMinutes < 1440) return `${Math.floor(diffInMinutes / 60)}h ago`;
+        else return `${Math.floor(diffInMinutes / 1440)}d ago`;
+      }
+
+      async function fetchScanStats(scanId) {
+        try {
+          const [drugRes, suspiciousRes] = await Promise.all([
+            api(`/api/scan/${scanId}/drug_messages`),
+            api(`/api/scan/${scanId}/suspicious_messages`)
+          ]);
+
+          if (!drugRes.ok || !suspiciousRes.ok) {
+            throw new Error("Failed to fetch scan messages");
+          }
+
+          const drugMessages = await drugRes.json();
+          const suspiciousMessages = await suspiciousRes.json();
+
+          const threats = Array.isArray(drugMessages) ? drugMessages.length : 0;
+          const suspicious = Array.isArray(suspiciousMessages) ? suspiciousMessages.length : 0;
+          const total = threats + suspicious;
+          const clean = total > 0 ? total - threats - suspicious : 0;
+
+          return {
+            threats_detected: threats,
+            suspicious_activities: suspicious,
+            clean_messages: clean,
+            total_messages: total
+          };
+        } catch (error) {
+          console.error(`Error fetching stats for scan ${scanId}:`, error);
+          showToast(`Error fetching stats for scan ${scanId}: ${error.message}`, "error");
+          return {
+            threats_detected: 0,
+            suspicious_activities: 0,
+            clean_messages: 0,
+            total_messages: 0
+          };
+        }
+      }
+
+      function renderHistoryItem(scan) {
+        const statsHtml = scan.status === "completed"
+          ? `
+          <div class="item-stats">
+            <div class="mini-stat">
+              <div class="mini-stat-value total">${scan.total_messages || 0}</div>
+              <div class="mini-stat-label">Messages</div>
+            </div>
+            <div class="mini-stat">
+              <div class="mini-stat-value threats">${scan.threats_detected || 0}</div>
+              <div class="mini-stat-label">Threats</div>
+            </div>
+            <div class="mini-stat">
+              <div class="mini-stat-value suspicious">${scan.suspicious_activities || 0}</div>
+              <div class="mini-stat-label">Suspicious</div>
+            </div>
+            <div class="mini-stat">
+              <div class="mini-stat-value clean">${scan.clean_messages || 0}</div>
+              <div class="mini-stat-label">Clean</div>
+            </div>
+          </div>
+        `
+          : "";
+
+        const runningBadge = scan.status === "running" ? '<div class="badge" style="background:#eab308;color:white;">Running...</div>' : '';
+
+        return `
+          <div class="history-item animate-in">
+            <div class="item-header">
+              <div class="item-info">
+                <div class="status-icon ${scan.status}">
+                  ${getStatusIcon(scan.status)}
+                </div>
+                <div>
+                  <div class="item-title">
+                    <span class="${getPlatformColor(scan.platform)}">
+                      ${scan.platform.charAt(0).toUpperCase() + scan.platform.slice(1)}
+                    </span>
+                    - ${scan.scan_type.charAt(0).toUpperCase() + scan.scan_type.slice(1)} Scan
+                  </div>
+                  <div class="item-subtitle">${scan.target}</div>
+                </div>
+              </div>
+              <div class="item-badges">
+                ${getRiskBadge(scan.risk_level, scan.threats_detected)}
+                <div class="badge badge-time">${getTimeAgo(scan.timestamp)}</div>
+                ${runningBadge}
+              </div>
+            </div>
+            ${statsHtml}
+            <div class="item-footer">
+              <div>
+                <span>Completed: ${formatDate(scan.timestamp)}</span>
+                ${
+                  scan.status === "completed"
+                    ? `<span style="margin-left: 20px;">Duration: ${scan.scan_time}s</span>`
+                    : ""
+                }
+              </div>
+              <div class="item-actions">
+                ${
+                  scan.status === "completed"
+                    ? `
+                  <button class="btn btn-sm" onclick="viewThreats('${scan.id}')">
+                    <i class="fas fa-eye"></i> View Threats
+                  </button>
+                  <button class="btn btn-sm" onclick="viewSuspicious('${scan.id}')">
+                    <i class="fas fa-exclamation-circle"></i> Review Suspicious
+                  </button>
+                `
+                    : '<span style="color:#aaa;">Processing...</span>'
+                }
+                <button class="btn btn-sm btn-danger" onclick="openConfirmModal('${scan.id}')">
+                  <i class="fas fa-trash"></i> Delete
+                </button>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      function renderHistory() {
+        const historyList = document.getElementById("history-list");
+        const emptyState = document.getElementById("empty-state");
+        if (filteredHistory.length === 0) {
+          historyList.innerHTML = "";
+          emptyState.classList.remove("hidden");
+        } else {
+          emptyState.classList.add("hidden");
+          historyList.innerHTML = filteredHistory.map(renderHistoryItem).join("");
+        }
+      }
+
+      function filterResults() {
+        const searchTerm = document.getElementById("search-input").value.toLowerCase();
+        const platformFilter = document.getElementById("platform-filter").value;
+        const statusFilter = document.getElementById("status-filter").value;
+
+        filteredHistory = scanHistory.filter((scan) => {
+          const matchesSearch =
+            !searchTerm ||
+            (scan.target && scan.target.toLowerCase().includes(searchTerm)) ||
+            (scan.platform && scan.platform.toLowerCase().includes(searchTerm)) ||
+            (scan.scan_type && scan.scan_type.toLowerCase().includes(searchTerm));
+          const matchesPlatform = platformFilter === "all" || scan.platform === platformFilter;
+          const matchesStatus = statusFilter === "all" || scan.status === statusFilter;
+          return matchesSearch && matchesPlatform && matchesStatus;
+        });
+
+        renderHistory();
+      }
+
+      async function fetchScanHistory() {
+        try {
+          const response = await api("/api/scan_history");
+          if (!response.ok) throw new Error("Failed to fetch scan history");
+          const newHistory = await response.json();
+          const hasRunning = newHistory.some(scan => scan.status === "running");
+
+          // Validate and fix scan data
+          scanHistory = await Promise.all(newHistory.map(async (scan) => {
+            // Ensure numeric fields
+            scan.total_messages = Number(scan.total_messages) || 0;
+            scan.threats_detected = Number(scan.threats_detected) || 0;
+            scan.suspicious_activities = Number(scan.suspicious_activities) || 0;
+            scan.clean_messages = Number(scan.clean_messages) || 0;
+
+            // If stats are all zero and status is completed, fetch from messages endpoints
+            if (scan.status === "completed" &&
+                scan.total_messages === 0 &&
+                scan.threats_detected === 0 &&
+                scan.suspicious_activities === 0 &&
+                scan.clean_messages === 0) {
+              const stats = await fetchScanStats(scan.id);
+              scan.total_messages = stats.total_messages;
+              scan.threats_detected = stats.threats_detected;
+              scan.suspicious_activities = stats.suspicious_activities;
+              scan.clean_messages = stats.clean_messages;
+              scan.risk_level = stats.threats_detected >= 10 ? "critical" :
+                                stats.threats_detected >= 3 ? "high" :
+                                stats.threats_detected >= 1 ? "medium" : "low";
+            }
+
+            return scan;
+          }));
+
+          filteredHistory = [...scanHistory];
+          updateStats();
+          renderHistory();
+
+          if (hasRunning && !pollInterval) {
+            pollInterval = setInterval(fetchScanHistory, 3000);
+            showToast("Live scan detected - auto-refreshing...", "success");
+          } else if (!hasRunning && pollInterval) {
+            clearInterval(pollInterval);
+            pollInterval = null;
+            showToast("All scans completed", "success");
+          }
+        } catch (error) {
+          console.error("Fetch error:", error);
+          showToast(error.message || "Error fetching scan history", "error");
+        }
+      }
+
+      async function deleteScan() {
+        if (!deleteScanId) return;
+        try {
+          const response = await api(`/api/scan/${deleteScanId}/delete`, { method: 'DELETE' });
+          if (!response.ok) throw new Error(await response.text());
+          showToast("Scan deleted successfully", "success");
+          closeConfirmModal();
+          fetchScanHistory();
+        } catch (error) {
+          console.error("Delete error:", error);
+          showToast("Failed to delete scan", "error");
+          closeConfirmModal();
+        }
+      }
+
+      function confirmDelete() {
+        deleteScan();
+      }
+
+      async function viewThreats(scanId) {
+        try {
+          const response = await api(`/api/scan/${scanId}/drug_messages`);
+          if (!response.ok) throw new Error("Failed to fetch drug messages");
+          const messages = await response.json();
+          if (!messages || !Array.isArray(messages)) {
+            throw new Error("Invalid response format for drug messages");
+          }
+          openModal("Drug-Related Threats", messages);
+        } catch (error) {
+          console.error("Threats error:", error);
+          showToast("Error loading threats: " + error.message, "error");
+        }
+      }
+
+      async function viewSuspicious(scanId) {
+        try {
+          const response = await api(`/api/scan/${scanId}/suspicious_messages`);
+          if (!response.ok) throw new Error("Failed to fetch suspicious messages");
+          const messages = await response.json();
+          if (!messages || !Array.isArray(messages)) {
+            throw new Error("Invalid response format for suspicious messages");
+          }
+          openModal("Review Suspicious Messages", messages, true);
+        } catch (error) {
+          console.error("Suspicious error:", error);
+          showToast("Error loading suspicious messages: " + error.message, "error");
+        }
+      }
+
+      async function reviewMessage(messageId, decision, listIndex) {
+        if (!messageId || messageId === 'undefined') {
+          showToast("Invalid message ID - cannot review", "error");
+          return;
+        }
+
+        try {
+          const response = await api(`/api/review_message/${messageId}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ decision })
+          });
+          if (!response.ok) throw new Error(await response.text());
+
+          showToast(`Message marked as ${decision === 'threat' ? 'Threat' : 'Clean'}`, "success");
+          const modal = document.getElementById('details-modal');
+          const items = modal.querySelectorAll('.message-item');
+          if (items[listIndex]) items[listIndex].remove();
+          fetchScanHistory();
+        } catch (error) {
+          console.error("Review error:", error);
+          showToast("Review failed", "error");
+        }
+      }
+
+      function updateStats() {
+        const totalScans = scanHistory.length;
+        const totalThreats = scanHistory.reduce((sum, scan) => sum + (Number(scan.threats_detected) || 0), 0);
+        const totalMessages = scanHistory.reduce((sum, scan) => sum + (Number(scan.total_messages) || 0), 0);
+        const successRate = totalScans
+          ? Math.round((scanHistory.filter((s) => s.status === "completed").length / totalScans) * 100)
+          : 0;
+
+        document.getElementById("total-scans").textContent = totalScans;
+        document.getElementById("total-threats").textContent = totalThreats;
+        document.getElementById("total-messages").textContent = totalMessages.toLocaleString();
+        document.getElementById("success-rate").textContent = `${successRate}%`;
+      }
+
+      async function exportData(format) {
+        try {
+          let data = { exportDate: new Date().toISOString(), totalScans: filteredHistory.length, scans: filteredHistory };
+          let filename = `nexus-clean-scan-history-${new Date().toISOString().split("T")[0]}`;
+
+          if (format === 'json') {
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `${filename}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+          } else if (format === 'csv') {
+            const csv = convertToCSV(data);
+            const blob = new Blob([csv], { type: "text/csv" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = `${filename}.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
+          } else if (format === 'pdf') {
+            generatePDF(data, filename);
+          }
+          showToast(`Exported as ${format.toUpperCase()}`, "success");
+          closeExportModal();
+        } catch (error) {
+          console.error("Export error:", error);
+          showToast("Export failed: " + error.message, "error");
+        }
+      }
+
+      function convertToCSV(data) {
+        const scans = data.scans || [data];
+        const headers = ["ID,Platform,Scan Type,Target,Status,Risk Level,Total Messages,Threats Detected,Suspicious Activities,Clean Messages,Scan Time,Timestamp"];
+        const rows = scans.map(scan => [
+          scan.id || '',
+          scan.platform || '',
+          scan.scan_type || '',
+          scan.target || '',
+          scan.status || '',
+          scan.risk_level || '',
+          Number(scan.total_messages) || 0,
+          Number(scan.threats_detected) || 0,
+          Number(scan.suspicious_activities) || 0,
+          Number(scan.clean_messages) || 0,
+          Number(scan.scan_time) || 0,
+          new Date(scan.timestamp).toLocaleString()
+        ].map(val => `"${String(val).replace(/"/g, '""')}"`).join(','));
+        return headers.concat(rows).join('\n');
+      }
+
+      function generatePDF(data, filename) {
+        try {
+          const { jsPDF } = window.jspdf;
+          const doc = new jsPDF();
+          doc.setFontSize(16);
+          doc.text("Nexus Clean Scan Report", 20, 20);
+          doc.setFontSize(12);
+          let y = 30;
+          const scans = data.scans || [data];
+          scans.forEach((scan, index) => {
+            doc.text(`Scan ${index + 1}: ${scan.platform} - ${scan.scan_type}`, 20, y);
+            doc.text(`Target: ${scan.target}`, 20, y + 10);
+            doc.text(`Status: ${scan.status}`, 20, y + 20);
+            doc.text(`Risk Level: ${scan.risk_level}`, 20, y + 30);
+            doc.text(`Messages: ${Number(scan.total_messages) || 0}`, 20, y + 40);
+            doc.text(`Threats: ${Number(scan.threats_detected) || 0}`, 20, y + 50);
+            y += 60;
+            if (y > 250) { doc.addPage(); y = 20; }
+          });
+          doc.save(`${filename}.pdf`);
+        } catch (error) {
+          console.error("PDF generation error:", error);
+          showToast("Failed to generate PDF", "error");
+        }
+      }
+
+      document.getElementById("logout-link").addEventListener("click", (e) => {
+        e.preventDefault();
+        localStorage.removeItem('jwt');
+        window.location.href = '/';
+      });
+
+      document.addEventListener("DOMContentLoaded", () => {
+        fetchScanHistory();
+        setTimeout(() => {
+          document.querySelectorAll(".stat-card").forEach((card, index) => {
+            setTimeout(() => card.classList.add("animate-in"), index * 100);
+          });
+        }, 300);
+
+        // Handle Escape key for all modals
+        document.addEventListener('keydown', (event) => {
+          if (event.key === 'Escape') {
+            closeModal();
+            closeExportModal();
+            closeConfirmModal();
+          }
+        });
+      });
+    </script>
+  </body>
+</html>

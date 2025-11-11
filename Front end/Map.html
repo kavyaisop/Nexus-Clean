@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>India Drug Use Prevalence Map - Nexus Clean</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    />
+    <style>
+      :root {
+        --bg-primary: #0f1419;
+        --bg-secondary: #1a2332;
+        --bg-card: #243447;
+        --bg-accent: #2d4059;
+        --text-primary: #ffffff;
+        --text-secondary: #e2e8f0;
+        --accent-1: #00bcd4;
+        --accent-2: #4fc3f7;
+        --accent-3: #ff7043;
+        --border-color: #334155;
+        --shadow: rgba(0, 0, 0, 0.3);
+        --glow: rgba(0, 188, 212, 0.3);
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        transition: all 0.3s ease;
+      }
+
+      body {
+        background: var(--bg-primary);
+        font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: var(--text-primary);
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+        overflow-x: hidden;
+      }
+
+      nav {
+        width: 100%;
+        background: var(--bg-secondary);
+        padding: 15px 30px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 2px 10px var(--shadow);
+        border-bottom: 1px solid var(--border-color);
+        z-index: 100;
+      }
+
+      nav h1 {
+        font-size: 1.8rem;
+        color: var(--text-primary);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-weight: 600;
+      }
+
+      .nav-links {
+        list-style: none;
+        display: flex;
+        gap: 30px;
+        align-items: center;
+      }
+
+      .nav-links li a {
+        text-decoration: none;
+        font-weight: 500;
+        color: var(--text-secondary);
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        border-radius: 6px;
+        font-size: 0.95rem;
+      }
+
+      .nav-links li a:hover {
+        color: var(--accent-1);
+        background: rgba(255, 255, 255, 0.05);
+      }
+
+      .nav-links li a.active {
+        color: var(--accent-1);
+        background: rgba(255, 255, 255, 0.05);
+      }
+
+      #map {
+        flex: 1;
+        width: 100%;
+        height: calc(100vh - 120px);
+      }
+
+      .info {
+        position: absolute;
+        top: 80px;
+        left: 10px;
+        background: var(--bg-card);
+        padding: 10px;
+        border-radius: 5px;
+        border: 1px solid var(--border-color);
+        box-shadow: 0 2px 8px var(--shadow);
+        line-height: 18px;
+        font-size: 14px;
+        color: var(--text-primary);
+        z-index: 1000;
+      }
+
+      .legend {
+        position: absolute;
+        bottom: 30px;
+        left: 10px;
+        background: var(--bg-card);
+        padding: 10px;
+        border-radius: 5px;
+        border: 1px solid var(--border-color);
+        box-shadow: 0 2px 8px var(--shadow);
+        line-height: 18px;
+        font-size: 14px;
+        color: var(--text-primary);
+        z-index: 1000;
+      }
+
+      .legend i {
+        width: 18px;
+        height: 18px;
+        float: left;
+        margin-right: 8px;
+        opacity: 0.7;
+      }
+
+      .map-title {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        z-index: 1000;
+        background: var(--bg-secondary);
+        padding: 10px;
+        border-radius: 5px;
+        border: 1px solid var(--border-color);
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: var(--text-primary);
+      }
+
+      .state-label {
+        background: transparent;
+        border: none;
+        font-size: 12px;
+        font-weight: bold;
+        color: var(--text-primary);
+        text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.8);
+        text-align: center;
+      }
+
+      .toast {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        padding: 12px 24px;
+        border-radius: 10px;
+        font-size: 0.95rem;
+        font-weight: 500;
+        color: white;
+        display: none;
+        z-index: 1000;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        animation: slideInRight 0.4s ease-out;
+      }
+
+      .toast.success { background: var(--accent-1); }
+      .toast.error { background: var(--accent-3); }
+
+      @keyframes slideInRight {
+        from { opacity: 0; transform: translateX(100%); }
+        to { opacity: 1; transform: translateX(0); }
+      }
+
+      footer {
+        background: var(--bg-secondary);
+        text-align: center;
+        padding: 25px;
+        font-size: 0.9rem;
+        border-top: 1px solid var(--border-color);
+        color: var(--text-secondary);
+      }
+
+      @media (max-width: 768px) {
+        nav { padding: 15px 20px; flex-direction: column; gap: 15px; }
+        .nav-links { gap: 15px; flex-wrap: wrap; justify-content: center; }
+        .map-title { font-size: 1rem; padding: 8px; }
+        .info, .legend { left: 5px; font-size: 12px; padding: 8px; }
+      }
+
+      @keyframes slideIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+
+      .animate-in { animation: slideIn 0.6s ease-out; }
+    </style>
+  </head>
+  <body class="animate-in">
+    <nav>
+      <h1><i class="fas fa-shield-alt"></i> Nexus Clean</h1>
+      <ul class="nav-links">
+        <li><a href="/dashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+        <li><a href="/livescan"><i class="fas fa-search"></i> Live Scan</a></li>
+        <li><a href="/scanhistory"><i class="fas fa-chart-line"></i> Scan History</a></li>
+        <li><a href="/trackuser"><i class="fas fa-location-dot"></i> Track User</a></li>
+        <li><a href="/aboutus"><i class="fas fa-info-circle"></i> About Us</a></li>
+        <li><a href="#" id="logout-link"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+      </ul>
+    </nav>
+
+    <div id="map"></div>
+    <div class="map-title">Prevalence of Illicit Drug Use in India by State (2022–2025)</div>
+
+    <footer>
+      © 2025 Nexus Clean - Drug Detection Dashboard. All rights reserved.
+    </footer>
+
+    <div id="toast" class="toast"></div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js"></script>
+    <script>
+      // === JWT GUARD ===
+      if (!localStorage.getItem('jwt')) {
+        window.location.href = '/';
+      }
+
+      // === API Helper ===
+      async function api(url, options = {}) {
+        const token = localStorage.getItem('jwt');
+        const headers = { ...options.headers, Authorization: `Bearer ${token}` };
+        const res = await fetch(url, { ...options, headers });
+        if (res.status === 401) {
+          localStorage.removeItem('jwt');
+          window.location.href = '/';
+        }
+        return res;
+      }
+
+      function showToast(message, type = 'error') {
+        const toast = document.getElementById("toast");
+        toast.textContent = message;
+        toast.className = `toast ${type}`;
+        toast.style.display = "block";
+        setTimeout(() => toast.style.display = "none", 4000);
+      }
+
+      // === Logout ===
+      document.getElementById("logout-link").addEventListener('click', (e) => {
+        e.preventDefault();
+        localStorage.removeItem('jwt');
+        window.location.href = '/';
+      });
+
+      // === Map Init ===
+      const map = L.map("map").setView([23.5937, 78.9629], 5);
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution: '&copy; OpenStreetMap contributors'
+      }).addTo(map);
+
+      // City-to-state mapping for India
+      const cityToState = {
+        "delhi": "delhi",
+        "mumbai": "maharashtra",
+        "kolkata": "west bengal",
+        "chennai": "tamil nadu",
+        "bengaluru": "karnataka",
+        "hyderabad": "telangana",
+        "ahmedabad": "gujarat",
+        "pune": "maharashtra",
+        "jaipur": "rajasthan",
+        "lucknow": "uttar pradesh",
+        "nyc": "maharashtra", // Map mock data cities to Indian states for testing
+        "la": "delhi",
+        "chi": "west bengal"
+      };
+
+      let prevalenceData = {};
+
+      async function fetchPrevalenceData() {
+        try {
+          const res = await api("/api/prevalence_data");
+          if (!res.ok) throw new Error("Failed to fetch prevalence data");
+          const data = await res.json();
+          // Convert city-based data to state-based prevalence
+          prevalenceData = {};
+          data.locations.forEach(loc => {
+            const state = cityToState[loc.city.toLowerCase()] || "unknown";
+            if (state !== "unknown") {
+              prevalenceData[state] = (prevalenceData[state] || 0) + (loc.count / 10); // Scale count to percentage
+            }
+          });
+          loadGeoJson();
+        } catch (e) {
+          showToast(e.message || "Error loading map data", "error");
+        }
+      }
+
+      function getStateName(props) {
+        const keys = ["NAME_1", "ST_NM", "st_nm", "name", "STATE_NAME", "State"];
+        for (let key of keys) if (props[key]) return props[key];
+        return "Unknown";
+      }
+
+      function normalizeStateName(name) {
+        if (!name) return "";
+        const map = {
+          "andaman and nicobar": "andaman nicobar islands",
+          "dadra and nagar haveli": "dadra nagar haveli daman diu",
+          "jammu and kashmir": "jammu kashmir"
+        };
+        return (map[name.toLowerCase().replace(/[^a-z\s]/g, "").replace(/\s+/g, " ").trim()] || name)
+          .toLowerCase().replace(/[^a-z\s]/g, "").replace(/\s+/g, " ").trim();
+      }
+
+      function getColor(prevalence) {
+        const max = 15;
+        const norm = Math.min(Math.max(prevalence, 0), max) / max;
+        const hue = 40 - 40 * norm;
+        return `hsl(${hue}, 80%, ${50 - 20 * norm}%)`;
+      }
+
+      function style(feature) {
+        const geoName = getStateName(feature.properties);
+        const normGeo = normalizeStateName(geoName);
+        let prevalence = prevalenceData[normGeo] || 0;
+        return { fillColor: getColor(prevalence), weight: 1, opacity: 1, color: "black", fillOpacity: 0.7 };
+      }
+
+      function highlightFeature(e) {
+        const layer = e.target;
+        layer.setStyle({ weight: 2, color: "#666", fillOpacity: 0.9 });
+        layer.bringToFront();
+        info.update(layer.feature.properties);
+      }
+
+      function resetHighlight(e) { geojson.resetStyle(e.target); info.update(); }
+      function zoomToFeature(e) { map.fitBounds(e.target.getBounds()); }
+
+      function getCentroid(feature) {
+        try {
+          const [lng, lat] = turf.centroid(feature).geometry.coordinates;
+          return [lat, lng];
+        } catch { return L.geoJson(feature).getBounds().getCenter(); }
+      }
+
+      function onEachFeature(feature, layer) {
+        layer.on({ mouseover: highlightFeature, mouseout: resetHighlight, click: zoomToFeature });
+        const name = getStateName(feature.properties);
+        if (name && name !== "Unknown") {
+          L.marker(getCentroid(feature), {
+            icon: L.divIcon({ className: "state-label", html: name, iconSize: [100, 20], iconAnchor: [50, 10] })
+          }).addTo(map);
+        }
+      }
+
+      const info = L.control();
+      info.onAdd = function() {
+        this._div = L.DomUtil.create("div", "info"); this.update(); return this._div;
+      };
+      info.update = function(props) {
+        if (!props) { this._div.innerHTML = "<h4>State Info</h4>Hover over a state"; return; }
+        const name = getStateName(props);
+        const norm = normalizeStateName(name);
+        let val = prevalenceData[norm] || 0;
+        this._div.innerHTML = `<h4>State Info</h4><b>${name}</b><br />Prevalence: ${val > 0 ? val.toFixed(1) + '%' : 'No data'}`;
+      };
+      info.addTo(map);
+
+      const legend = L.control({ position: "bottomright" });
+      legend.onAdd = function() {
+        const div = L.DomUtil.create("div", "legend");
+        const grades = [0, 2, 4, 6, 8, 10, 12, 14, 15];
+        div.innerHTML = '<h4>Prevalence (%)</h4>' + grades.slice(0, -1).map((g, i) =>
+          `<i style="background:${getColor(g)}"></i> ${g}–${grades[i+1]}`
+        ).join('<br>') + `<i style="background:${getColor(15)}"></i> 15+`;
+        return div;
+      };
+      legend.addTo(map);
+
+      let geojson;
+      function loadGeoJson() {
+        fetch("https://raw.githubusercontent.com/geohacker/india/master/state/india_state.geojson")
+          .then(r => r.ok ? r.json() : Promise.reject("GeoJSON load failed"))
+          .then(data => {
+            geojson = L.geoJson(data, { style, onEachFeature }).addTo(map);
+          })
+          .catch(e => showToast("Failed to load map geometry", "error"));
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        fetchPrevalenceData();
+      });
+    </script>
+  </body>
+</html>

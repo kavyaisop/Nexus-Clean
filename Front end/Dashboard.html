@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nexus Clean - Drug Detection Hub</title>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    :root {
+      --bg-primary: #0f1419;
+      --bg-secondary: #1a2332;
+      --bg-card: #243447;
+      --bg-accent: #2d4059;
+      --text-primary: #ffffff;
+      --text-secondary: #e2e8f0;
+      --accent-1: #00bcd4;
+      --accent-2: #4fc3f7;
+      --accent-3: #ff7043;
+      --border-color: #334155;
+      --shadow: rgba(0, 0, 0, 0.3);
+      --glow: rgba(0, 188, 212, 0.3);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: "Inter", sans-serif;
+    }
+
+    body {
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Navbar */
+    nav {
+      background: var(--bg-secondary);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border-color);
+      box-shadow: 0 2px 10px var(--shadow);
+      z-index: 1000;
+    }
+
+    nav h1 {
+      font-size: 1.8rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 1.5rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      border-radius: 6px;
+      transition: all 0.3s;
+    }
+
+    .nav-links a:hover {
+      color: var(--accent-1);
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .nav-links a.active {
+      color: var(--accent-1);
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    /* Layout */
+    .container {
+      flex: 1;
+      padding: 2rem;
+      max-width: 1400px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .header h1 {
+      font-size: 2.8rem;
+      font-weight: 700;
+      color: var(--accent-1);
+    }
+
+    /* Platform Selector */
+    .platform-selector {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .platform-btn {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      color: var(--text-secondary);
+      padding: 0.6rem 1.2rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.3s;
+    }
+
+    .platform-btn:hover,
+    .platform-btn.active {
+      background: var(--accent-1);
+      color: var(--bg-primary);
+      border-color: var(--accent-1);
+    }
+
+    /* Stats Grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .stat-card {
+      background: var(--bg-card);
+      padding: 1.5rem;
+      border-radius: 12px;
+      text-align: center;
+      border: 1px solid var(--border-color);
+      box-shadow: 0 2px 8px var(--shadow);
+      transition: transform 0.3s;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-4px);
+    }
+
+    .stat-card i {
+      font-size: 2rem;
+      color: var(--accent-2);
+      margin-bottom: 0.8rem;
+    }
+
+    .stat-card h2 {
+      font-size: 2.2rem;
+      color: var(--accent-1);
+      margin: 0.5rem 0;
+      font-weight: 700;
+    }
+
+    .stat-card p {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+    }
+
+    /* Main Grid */
+    .main-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border-radius: 12px;
+      padding: 1.5rem;
+      border: 1px solid var(--border-color);
+      box-shadow: 0 2px 8px var(--shadow);
+      transition: all 0.3s;
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 4px 20px var(--glow);
+    }
+
+    .card h3 {
+      font-size: 1.3rem;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--text-primary);
+    }
+
+    .card p {
+      font-size: 0.95rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    .card.clickable {
+      cursor: pointer;
+    }
+
+    /* Chart Container */
+    .chart-container {
+      position: relative;
+      height: 180px;
+      margin-top: 1rem;
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 8px;
+      padding: 1rem;
+    }
+
+    /* Chart.js Custom Styling */
+    canvas.chartjs-render-chart:hover {
+      filter: brightness(1.2);
+    }
+
+    /* Recent Alerts */
+    .recent-alerts ul {
+      list-style: none;
+      max-height: 220px;
+      overflow-y: auto;
+      padding-right: 8px;
+    }
+
+    .recent-alerts li {
+      padding: 0.8rem 0;
+      border-bottom: 1px solid var(--border-color);
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      transition: all 0.3s;
+    }
+
+    .recent-alerts li:hover {
+      color: var(--accent-1);
+      transform: translateX(4px);
+    }
+
+    .recent-alerts li::before {
+      content: "⚠️";
+      margin-right: 8px;
+      color: var(--accent-3);
+    }
+
+    /* AI Model */
+    .model-selector {
+      display: flex;
+      gap: 0.8rem;
+      margin: 1rem 0;
+    }
+
+    .model-btn {
+      flex: 1;
+      padding: 0.6rem;
+      background: var(--bg-accent);
+      border: none;
+      color: var(--text-secondary);
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 500;
+    }
+
+    .model-btn.active {
+      background: var(--accent-1);
+      color: var(--bg-primary);
+    }
+
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-top: 1rem;
+    }
+
+    .metric {
+      text-align: center;
+      padding: 1rem;
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 8px;
+    }
+
+    .metric h4 {
+      color: var(--accent-1);
+      font-size: 1.6rem;
+      margin-bottom: 0.3rem;
+    }
+
+    /* Slogan */
+    .slogan {
+      grid-column: 1 / -1;
+      background: linear-gradient(135deg, var(--bg-accent), var(--bg-card));
+      padding: 2.5rem;
+      border-radius: 12px;
+      text-align: center;
+      border: 1px solid var(--border-color);
+    }
+
+    .slogan h2 {
+      font-size: 1.8rem;
+      margin-bottom: 1rem;
+    }
+
+    .slogan p {
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    /* Footer */
+    footer {
+      text-align: center;
+      padding: 1.5rem;
+      background: var(--bg-secondary);
+      color: var(--text-secondary);
+      font-size: 0.9rem;
+      border-top: 1px solid var(--border-color);
+    }
+
+    /* Toast */
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      padding: 12px 24px;
+      border-radius: 8px;
+      color: white;
+      font-weight: 600;
+      display: none;
+      z-index: 1000;
+    }
+
+    .toast.success { background: var(--accent-1); }
+    .toast.error { background: var(--accent-3); }
+
+    /* Loading */
+    .loading {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: var(--bg-card);
+      padding: 24px 32px;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px var(--shadow);
+      z-index: 2000;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      font-size: 1rem;
+      border: 1px solid var(--border-color);
+    }
+
+    .spinner {
+      width: 36px;
+      height: 36px;
+      border: 4px solid var(--border-color);
+      border-top: 4px solid var(--accent-1);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .animate-in {
+      animation: slideIn 0.6s ease-out;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .nav-links { flex-direction: column; gap: 1rem; }
+      .header h1 { font-size: 2.2rem; }
+      .main-grid { grid-template-columns: 1fr; }
+      .platform-selector { justify-content: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav>
+    <h1><i class="fas fa-shield-alt"></i> Nexus Clean</h1>
+    <ul class="nav-links">
+      <li><a href="./Dashboard.html" class="active"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+      <li><a href="./LiveScan.html"><i class="fas fa-search"></i> Live Scan</a></li>
+      <li><a href="./ScanHistory.html"><i class="fas fa-chart-line"></i> History</a></li>
+      <li><a href="./trackuser"><i class="fas fa-location-dot"></i> Track User</a></li>
+      <li><a href="./AboutUs.html"><i class="fas fa-info-circle"></i> About</a></li>
+      <li><a href="#" id="logout-link"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+    </ul>
+  </nav>
+
+  <!-- Loading -->
+  <div class="loading" id="loading">
+    <div class="spinner"></div>
+    <div>Loading dashboard data...</div>
+  </div>
+
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <h1>Nexus Clean Dashboard</h1>
+    </div>
+
+    <!-- Platform Selector -->
+    <div class="platform-selector">
+      <button class="platform-btn active" data-platform="all"><i class="fas fa-globe"></i> All</button>
+      <button class="platform-btn" data-platform="instagram"><i class="fab fa-instagram"></i> Instagram</button>
+      <button class="platform-btn" data-platform="telegram"><i class="fab fa-telegram"></i> Telegram</button>
+      <button class="platform-btn" data-platform="whatsapp"><i class="fab fa-whatsapp"></i> WhatsApp</button>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-grid">
+      <div class="stat-card"><i class="fas fa-users"></i><h2 id="totalUsers">0</h2><p>Total Users</p></div>
+      <div class="stat-card"><i class="fas fa-user-plus"></i><h2 id="newUsersToday">0</h2><p>New Users Today</p></div>
+      <div class="stat-card"><i class="fas fa-user-shield"></i><h2 id="flaggedUsers">0</h2><p>Flagged Users</p></div>
+      <div class="stat-card"><i class="fas fa-user-clock"></i><h2 id="activeUsers">0</h2><p>Active Users</p></div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-grid">
+      <!-- Instagram -->
+      <div class="card clickable" data-platform="instagram" onclick="window.location.href='./LiveScan.html'">
+        <h3><i class="fab fa-instagram"></i> Instagram Monitoring</h3>
+        <p>Real-time scanning of posts, stories, and DMs for drug-related content</p>
+        <div class="chart-container">
+          <canvas id="instagramChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Telegram -->
+      <div class="card clickable" data-platform="telegram" onclick="window.location.href='./LiveScan.html'">
+        <h3><i class="fab fa-telegram"></i> Telegram Tracking</h3>
+        <p>Advanced monitoring of channels and groups</p>
+        <div class="chart-container">
+          <canvas id="telegramChart"></canvas>
+        </div>
+      </div>
+
+      <!-- WhatsApp -->
+      <div class="card clickable" data-platform="whatsapp" onclick="window.location.href='./LiveScan.html'">
+        <h3><i class="fab fa-whatsapp"></i> WhatsApp Analysis</h3>
+        <p>Secure scanning of reported conversations</p>
+        <div class="chart-container">
+          <canvas id="whatsappChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Recent Alerts -->
+      <div class="card recent-alerts">
+        <h3><i class="fas fa-exclamation-circle"></i> Latest Detections</h3>
+        <ul id="recent-detections"><li>Loading...</li></ul>
+      </div>
+
+      <!-- AI Model -->
+      <div class="card" style="grid-column: span 2">
+        <h3><i class="fas fa-robot"></i> AI Detection Engine</h3>
+        <div class="model-selector">
+          <button class="model-btn active" data-model="small">Nexus Small</button>
+          <button class="model-btn" data-model="large">Nexus Large</button>
+        </div>
+        <div class="metrics-grid" id="model-metrics">
+          <div class="metric"><h4>98.7%</h4><p>Detection Accuracy</p></div>
+          <div class="metric"><h4>0.3s</h4><p>Avg Response Time</p></div>
+        </div>
+      </div>
+
+      <!-- Geographic -->
+      <div class="card clickable" style="grid-column: span 2" onclick="window.location.href='./Map.html'">
+        <h3><i class="fas fa-map-marked-alt"></i> Geographic Activity</h3>
+        <p>Drug activity hotspots</p>
+        <div style="display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-top: 1rem;">
+          <div style="height: 50px; background: var(--accent-1); border-radius: 6px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600;">Bom</div>
+          <div style="height: 70px; background: var(--accent-2); border-radius: 6px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600;">RAJ</div>
+          <div style="height: 40px; background: var(--accent-3); border-radius: 6px; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600;">DEL</div>
+        </div>
+      </div>
+
+      <!-- Slogan -->
+      <div class="slogan">
+        <h2><i class="fas fa-shield-virus"></i> Advanced Drug Detection</h2>
+        <p>AI-powered monitoring across social platforms to protect communities.</p>
+      </div>
+    </div>
+  </div>
+
+  <footer>© 2025 Nexus Clean. All rights reserved.</footer>
+  <div id="toast" class="toast"></div>
+
+  <script>
+    // === AUTH GUARD ===
+    if (!localStorage.getItem('jwt')) {
+      window.location.href = './Login.html';
+    }
+
+    // === API Helper ===
+    async function api(url) {
+      const token = localStorage.getItem('jwt');
+      try {
+        const res = await fetch(url, {
+          headers: { 'Authorization': `Bearer ${token}` },
+          timeout: 5000
+        });
+        if (res.status === 401) {
+          localStorage.removeItem('jwt');
+          window.location.href = './Login.html';
+        }
+        if (!res.ok) {
+          throw new Error(`HTTP error! status: ${res.status}`);
+        }
+        return await res.json();
+      } catch (error) {
+        throw new Error(`API request failed: ${error.message}`);
+      }
+    }
+
+    // === Toast ===
+    function showToast(msg, type = 'success') {
+      const toast = document.getElementById('toast');
+      toast.textContent = msg;
+      toast.className = `toast ${type}`;
+      toast.style.display = 'block';
+      setTimeout(() => toast.style.display = 'none', 3000);
+    }
+
+    // === Counter Animation ===
+    function animateValue(id, start, end, duration = 2000) {
+      const obj = document.getElementById(id);
+      let startTime = null;
+      const step = (timestamp) => {
+        if (!startTime) startTime = timestamp;
+        const progress = Math.min((timestamp - startTime) / duration, 1);
+        obj.innerHTML = Math.floor(progress * (end - start) + start).toLocaleString();
+        if (progress < 1) requestAnimationFrame(step);
+      };
+      requestAnimationFrame(step);
+    }
+
+    // === Charts ===
+    let instagramChart, telegramChart, whatsappChart;
+
+    function createChart(ctx, type, data, labels, color) {
+      return new Chart(ctx, {
+        type,
+        data: {
+          labels,
+          datasets: [{
+            data,
+            backgroundColor: type === 'doughnut' ? color : `rgba(0,188,212,0.6)`,
+            borderColor: type === 'doughnut' ? color : '#00bcd4',
+            borderWidth: 1,
+            hoverBackgroundColor: type === 'doughnut' ? color.map(c => c.replace('0.6', '0.8')) : 'rgba(0,188,212,0.8)',
+            hoverBorderColor: type === 'doughnut' ? color : '#00bcd4'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: type !== 'doughnut' ? {
+            y: { beginAtZero: true, ticks: { color: 'var(--text-secondary)' } },
+            x: { ticks: { color: 'var(--text-secondary)' } }
+          } : {}
+        }
+      });
+    }
+
+    // === Chart Interactions ===
+    function setupChartInteractions() {
+      [instagramChart, telegramChart, whatsappChart].forEach(chart => {
+        if (chart) {
+          chart.canvas.addEventListener('mouseenter', () => {
+            chart.canvas.style.filter = 'brightness(1.2)';
+            chart.canvas.style.transform = 'scale(1.05)';
+          });
+          chart.canvas.addEventListener('mouseleave', () => {
+            chart.canvas.style.filter = '';
+            chart.canvas.style.transform = '';
+          });
+        }
+      });
+    }
+
+    // === Load Data ===
+    async function loadDashboard() {
+      const loading = document.getElementById('loading');
+      try {
+        // Fetch dashboard stats
+        const stats = await api('/api/dashboard_stats');
+        if (!stats) throw new Error('Invalid stats response');
+
+        // Fetch recent scans for detections
+        const scanHistory = await api('/api/scan_history');
+        if (!scanHistory) throw new Error('Invalid scan history response');
+
+        // Fetch drug-related messages for recent scans
+        const recentDetections = [];
+        for (let scan of scanHistory.slice(0, 5)) { // Limit to 5 recent scans
+          if (scan.threats_detected > 0) {
+            const drugMessages = await api(`/api/scan/${scan.id}/drug_messages`);
+            drugMessages.forEach(msg => {
+              recentDetections.push({
+                platform: msg.platform,
+                time: new Date(msg.timestamp).toLocaleString(),
+                details: msg.message,
+                threats_detected: 1
+              });
+            });
+          }
+        }
+
+        // Update Stats
+        animateValue('totalUsers', 0, stats.totalUsers || 0);
+        animateValue('newUsersToday', 0, stats.newUsersToday || 0);
+        animateValue('flaggedUsers', 0, stats.flaggedUsers || 0);
+        animateValue('activeUsers', 0, stats.activeUsers || 0);
+
+        // Recent Detections
+        const ul = document.getElementById('recent-detections');
+        ul.innerHTML = recentDetections.length
+          ? recentDetections.map(d => `<li>${d.platform} - ${d.time}: ${d.details} (${d.threats_detected} threat)</li>`).join('')
+          : '<li>No recent detections</li>';
+
+        // Charts (Fake Data)
+        const igCtx = document.getElementById('instagramChart').getContext('2d');
+        const tgCtx = document.getElementById('telegramChart').getContext('2d');
+        const waCtx = document.getElementById('whatsappChart').getContext('2d');
+
+        instagramChart = createChart(igCtx, 'bar', [80, 65, 90, 50, 70], ['Posts', 'Stories', 'DMs', 'Alerts', 'Reports'], 'rgba(0,188,212,0.6)');
+        telegramChart = createChart(tgCtx, 'doughnut', [30, 40, 30], ['Low', 'Med', 'High'], ['#10b981', '#fbbf24', '#ef4444']);
+        whatsappChart = createChart(waCtx, 'line', [40, 60, 50, 70, 55, 85, 75], ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'], '#4fc3f7');
+
+        setupChartInteractions();
+        loading.style.display = 'none';
+      } catch (err) {
+        showToast(`Failed to load data: ${err.message}`, 'error');
+        loading.innerHTML = `
+          <div>Error: ${err.message}</div>
+          <button onclick="location.reload()" style="margin-top:10px;padding:8px 16px;background:var(--accent-1);border:none;border-radius:6px;color:white;cursor:pointer;">
+            Retry
+          </button>
+        `;
+      }
+    }
+
+    // === Platform Filter ===
+    document.querySelectorAll('.platform-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.platform-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const platform = btn.dataset.platform;
+        document.querySelectorAll('.card[data-platform]').forEach(card => {
+          card.style.display = platform === 'all' || card.dataset.platform === platform ? 'block' : 'none';
+        });
+      });
+    });
+
+    // === Model Switch ===
+    document.querySelectorAll('.model-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.model-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const isLarge = btn.dataset.model === 'large';
+        document.getElementById('model-metrics').innerHTML = `
+          <div class="metric"><h4>${isLarge ? '99.2%' : '98.7%'}</h4><p>Detection Accuracy</p></div>
+          <div class="metric"><h4>${isLarge ? '0.8s' : '0.3s'}</h4><p>Avg Response Time</p></div>
+        `;
+      });
+    });
+
+    // === Logout ===
+    document.getElementById('logout-link').addEventListener('click', e => {
+      e.preventDefault();
+      localStorage.removeItem('jwt');
+      window.location.href = './Login.html';
+    });
+
+    // === Init ===
+    document.addEventListener('DOMContentLoaded', () => {
+      loadDashboard();
+      document.querySelectorAll('.card').forEach((card, index) => {
+        setTimeout(() => card.classList.add('animate-in'), index * 100);
+      });
+    });
+  </script>
+</body>
+</html>

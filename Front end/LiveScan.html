@@ -1,0 +1,1410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Live Scan - Nexus Clean</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    /* Same styles as provided in the original LiveScan.html, unchanged */
+    :root {
+      --bg-primary: #0a1016;
+      --bg-secondary: #1c252b;
+      --bg-card: #2a3441;
+      --bg-accent: #3a4656;
+      --text-primary: #ffffff;
+      --text-secondary: #d1d5db;
+      --accent-1: #00a3b9;
+      --accent-2: #38bdf8;
+      --accent-3: #f97316;
+      --border-color: #3f4b5b;
+      --shadow: rgba(0, 0, 0, 0.2);
+      --glow: rgba(0, 163, 185, 0.2);
+      --error: #ef4444;
+      --success: #10b981;
+      --gradient: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Inter', sans-serif;
+      transition: all 0.3s ease;
+    }
+
+    body {
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    nav {
+      background: var(--bg-secondary);
+      padding: 1.25rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 12px var(--shadow);
+      border-bottom: 1px solid var(--border-color);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    nav h1 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      color: var(--accent-1);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 1.5rem;
+      list-style: none;
+    }
+
+    .nav-links li a {
+      text-decoration: none;
+      color: var(--text-secondary);
+      font-weight: 500;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.95rem;
+    }
+
+    .nav-links li a:hover,
+    .nav-links li a.active {
+      color: var(--text-primary);
+      background: var(--accent-1);
+    }
+
+    .main {
+      flex: 1;
+      padding: 3rem 2.5rem;
+      max-width: 1440px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    .header {
+      margin-bottom: 3rem;
+      text-align: center;
+    }
+
+    .header h1 {
+      font-size: 2.75rem;
+      font-weight: 800;
+      color: var(--accent-1);
+      margin-bottom: 0.75rem;
+    }
+
+    .header p {
+      font-size: 1.1rem;
+      color: var(--text-secondary);
+      max-width: 700px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+
+    .platform-selector {
+      display: flex;
+      justify-content: center;
+      gap: 1.25rem;
+      margin: 2.5rem 0;
+      flex-wrap: wrap;
+    }
+
+    .platform-btn {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+      padding: 0.75rem 1.5rem;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+    .platform-btn:hover,
+    .platform-btn.active {
+      background: var(--gradient);
+      border-color: transparent;
+      transform: translateY(-3px);
+      box-shadow: 0 6px 16px var(--glow);
+    }
+
+    .platform-description {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 1.75rem;
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+      margin-bottom: 2.5rem;
+      box-shadow: 0 4px 12px var(--shadow);
+    }
+
+    .platform-description i {
+      font-size: 2rem;
+      color: var(--accent-1);
+    }
+
+    .platform-description h3 {
+      font-size: 1.5rem;
+      font-weight: 700;
+    }
+
+    .platform-description p {
+      color: var(--text-secondary);
+      font-size: 1rem;
+      line-height: 1.5;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 2rem;
+      box-shadow: 0 4px 12px var(--shadow);
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 20px var(--glow);
+    }
+
+    .card h3 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+      color: var(--text-primary);
+    }
+
+    .card p {
+      color: var(--text-secondary);
+      font-size: 1rem;
+      line-height: 1.6;
+      margin-bottom: 1.5rem;
+    }
+
+    .hashtag-card {
+      background: var(--bg-card);
+      padding: 2.5rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px var(--shadow);
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .hashtag-card .form-group {
+      margin-bottom: 0;
+    }
+
+    .hashtag-suggestions {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 0.75rem;
+      margin-top: 1rem;
+      padding: 1rem;
+      background: var(--bg-accent);
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+    }
+
+    .hashtag-suggestions span {
+      background: linear-gradient(135deg, var(--bg-card), var(--bg-accent));
+      padding: 0.6rem 1rem;
+      border-radius: 20px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.9rem;
+      text-align: center;
+      color: var(--text-primary);
+      border: 1px solid var(--border-color);
+      transition: background 0.3s, transform 0.3s, box-shadow 0.3s;
+    }
+
+    .hashtag-suggestions span:hover {
+      background: var(--accent-1);
+      color: var(--text-primary);
+      transform: scale(1.05);
+      box-shadow: 0 4px 12px var(--glow);
+      border-color: transparent;
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 1rem 1.25rem;
+      background: var(--bg-accent);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      color: var(--text-primary);
+      font-size: 1rem;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: var(--accent-1);
+      box-shadow: 0 0 0 3px var(--glow);
+    }
+
+    .form-input::placeholder {
+      color: rgba(209, 213, 219, 0.5);
+    }
+
+    .form-input.error {
+      border-color: var(--error);
+      box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+    }
+
+    .form-textarea {
+      min-height: 140px;
+      resize: vertical;
+    }
+
+    .error-message {
+      color: var(--error);
+      font-size: 0.85rem;
+      margin-top: 0.5rem;
+      display: none;
+    }
+
+    .error-message.show {
+      display: block;
+    }
+
+    .btn {
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      font-size: 1rem;
+      text-decoration: none;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .btn-primary {
+      background: var(--gradient);
+      color: var(--text-primary);
+    }
+
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #008a9e, #29b6f6);
+      transform: translateY(-3px);
+      box-shadow: 0 6px 16px var(--glow);
+    }
+
+    .btn-secondary {
+      background: var(--bg-accent);
+      color: var(--text-primary);
+      border: 1px solid var(--border-color);
+    }
+
+    .btn-secondary:hover {
+      background: var(--accent-1);
+      border-color: transparent;
+      transform: translateY(-3px);
+    }
+
+    .btn-accent {
+      background: var(--accent-3);
+      color: var(--text-primary);
+    }
+
+    .btn-accent:hover {
+      background: #e86514;
+      transform: translateY(-3px);
+      box-shadow: 0 6px 16px rgba(249, 115, 22, 0.3);
+    }
+
+    .btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .btn-full {
+      width: 100%;
+    }
+
+    .grid-1 {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 2rem;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 2rem;
+    }
+
+    .file-upload {
+      border: 2px dashed var(--border-color);
+      border-radius: 12px;
+      padding: 2.5rem;
+      text-align: center;
+      cursor: pointer;
+      margin-bottom: 1.5rem;
+      transition: border-color 0.3s, background 0.3s;
+    }
+
+    .file-upload:hover {
+      border-color: var(--accent-3);
+      background: rgba(249, 115, 22, 0.05);
+    }
+
+    .file-upload i {
+      font-size: 2.75rem;
+      color: var(--accent-3);
+      margin-bottom: 1rem;
+    }
+
+    .file-upload h4 {
+      font-weight: 700;
+      font-size: 1.25rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .file-upload p {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+    }
+
+    .file-input {
+      display: none;
+    }
+
+    .file-info {
+      background: var(--bg-accent);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .file-info i {
+      color: var(--accent-1);
+      font-size: 1.5rem;
+    }
+
+    .instructions {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-top: 1.5rem;
+    }
+
+    .instructions h4 {
+      font-weight: 700;
+      font-size: 1.25rem;
+      margin-bottom: 1rem;
+    }
+
+    .instructions ol {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+      line-height: 1.6;
+      padding-left: 1.5rem;
+    }
+
+    .scan-results {
+      margin-top: 3rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 2rem;
+      box-shadow: 0 4px 12px var(--shadow);
+      animation: slideIn 0.5s ease-out;
+    }
+
+    .results-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .results-header i {
+      color: var(--success);
+      font-size: 1.75rem;
+    }
+
+    .results-header h3 {
+      font-size: 1.75rem;
+      font-weight: 700;
+    }
+
+    .results-meta {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+    }
+
+    .results-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.25rem;
+      margin: 1.5rem 0;
+    }
+
+    .result-stat {
+      background: var(--bg-accent);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 1.25rem;
+      text-align: center;
+    }
+
+    .result-value {
+      font-size: 2rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    .result-value.threats { color: var(--error); }
+    .result-value.suspicious { color: #eab308; }
+    .result-value.clean { color: var(--success); }
+    .result-value.total { color: var(--accent-1); }
+
+    .result-label {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+      font-weight: 500;
+    }
+
+    .result-badges {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    .badge-success {
+      background: var(--success);
+      color: var(--text-primary);
+    }
+
+    .badge-danger {
+      background: var(--error);
+      color: var(--text-primary);
+    }
+
+    .target-list {
+      max-height: 300px;
+      overflow-y: auto;
+      background: var(--bg-accent);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 1rem;
+      margin: 1.5rem 0;
+    }
+
+    .target-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.75rem 0;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .target-item:last-child {
+      border-bottom: none;
+    }
+
+    .target-item label {
+      flex: 1;
+      color: var(--text-primary);
+      font-size: 1rem;
+      cursor: pointer;
+    }
+
+    .target-item input[type="checkbox"] {
+      accent-color: var(--accent-1);
+      width: 18px;
+      height: 18px;
+    }
+
+    .model-selector {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 2rem;
+      margin-bottom: 3rem;
+      text-align: center;
+      box-shadow: 0 4px 12px var(--shadow);
+    }
+
+    .model-options {
+      display: flex;
+      justify-content: center;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+      margin: 1.5rem;
+    }
+
+    .model-option {
+      background: var(--bg-accent);
+      border: 2px solid transparent;
+      padding: 1.5rem;
+      border-radius: 10px;
+      cursor: pointer;
+      min-width: 220px;
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+    .model-option.selected {
+      border-color: var(--accent-1);
+      background: rgba(0, 163, 185, 0.1);
+      box-shadow: 0 0 0 4px var(--glow);
+      transform: translateY(-3px);
+    }
+
+    .model-option h4 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    .model-option p {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    .loading-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(10, 16, 22, 0.85);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      visibility: hidden;
+      opacity: 0;
+      transition: all 0.3s ease;
+    }
+
+    .loading-overlay.active {
+      visibility: visible;
+      opacity: 1;
+    }
+
+    .loading-overlay .spinner {
+      width: 48px;
+      height: 48px;
+      border: 4px solid var(--accent-1);
+      border-top-color: transparent;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    .loading-overlay span {
+      margin-top: 1rem;
+      font-size: 1rem;
+      color: var(--text-primary);
+      font-weight: 500;
+    }
+
+    .toast {
+      position: fixed;
+      top: 1.5rem;
+      right: 1.5rem;
+      background: var(--success);
+      color: var(--text-primary);
+      padding: 0.75rem 1.5rem;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      z-index: 1000;
+      box-shadow: 0 4px 12px var(--shadow);
+      animation: slideIn 0.3s ease-out;
+      display: none;
+    }
+
+    .toast.error {
+      background: var(--error);
+    }
+
+    .hashtag-history {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 2rem;
+      margin-top: 2rem;
+      box-shadow: 0 4px 12px var(--shadow);
+    }
+
+    .hashtag-history h3 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      color: var(--text-primary);
+    }
+
+    .hashtag-history ul {
+      list-style: none;
+      display: grid;
+      gap: 0.75rem;
+    }
+
+    .hashtag-history li {
+      background: var(--bg-accent);
+      padding: 0.75rem 1.25rem;
+      border-radius: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: var(--text-primary);
+      font-size: 0.95rem;
+    }
+
+    .hashtag-history li span.status {
+      font-size: 0.85rem;
+      padding: 0.25rem 0.75rem;
+      border-radius: 12px;
+    }
+
+    .hashtag-history li span.status.pending {
+      background: var(--accent-3);
+      color: var(--text-primary);
+    }
+
+    .hashtag-history li span.status.completed {
+      background: var(--success);
+      color: var(--text-primary);
+    }
+
+    .hashtag-history li span.status.failed {
+      background: var(--error);
+      color: var(--text-primary);
+    }
+
+    .hashtag-history li .results {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .animate-in {
+      animation: slideIn 0.6s ease-out;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    footer {
+      background: var(--bg-secondary);
+      text-align: center;
+      padding: 1.75rem;
+      font-size: 0.95rem;
+      border-top: 1px solid var(--border-color);
+      color: var(--text-secondary);
+    }
+
+    @media (max-width: 1024px) {
+      .grid-3 { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 768px) {
+      .main { padding: 2rem 1.5rem; }
+      nav { padding: 1rem; flex-direction: column; gap: 1.5rem; }
+      .nav-links { gap: 1rem; flex-wrap: wrap; justify-content: center; }
+      .header h1 { font-size: 2.25rem; }
+      .platform-selector { gap: 1rem; }
+      .platform-btn { padding: 0.6rem 1.2rem; font-size: 0.95rem; }
+      .model-options { flex-direction: column; align-items: center; }
+      .hashtag-card .hashtag-suggestions { grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); }
+      .hashtag-suggestions span { font-size: 0.85rem; padding: 0.5rem 0.8rem; }
+    }
+
+    @media (max-width: 480px) {
+      .header h1 { font-size: 1.75rem; }
+      .header p { font-size: 0.95rem; }
+      .form-input { font-size: 0.9rem; }
+      .btn { font-size: 0.9rem; }
+      .card { padding: 1.5rem; }
+      .hashtag-card { padding: 1.5rem; }
+      .hashtag-suggestions span { font-size: 0.8rem; }
+    }
+  </style>
+</head>
+<body class="animate-in">
+  <nav>
+    <h1><i class="fas fa-shield-alt"></i> Nexus Clean</h1>
+    <ul class="nav-links">
+      <li><a href="./Dashboard.html"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+      <li><a href="./LiveScan.html" class="active"><i class="fas fa-search"></i> Live Scan</a></li>
+      <li><a href="./ScanHistory.html"><i class="fas fa-chart-line"></i> Scan History</a></li>
+      <li><a href="./TrackUser.html"><i class="fas fa-user-check"></i> Track Users</a></li>
+      <li><a href="./AboutUs.html"><i class="fas fa-info-circle"></i> About Us</a></li>
+      <li><a href="#" id="logout-link"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+    </ul>
+  </nav>
+
+  <div class="main">
+    <!-- Header -->
+    <div class="header">
+      <h1>Live Drug Detection Scanner</h1>
+      <p>Real-time monitoring and analysis of social media platforms for drug-related activities.</p>
+    </div>
+
+    <!-- Model Selector -->
+    <div class="model-selector">
+      <h3><i class="fas fa-brain"></i> Select AI Model</h3>
+      <div class="model-options">
+        <div class="model-option selected" data-model="nexus_small">
+          <h4>Nexus Small</h4>
+          <p>Fast • Lightweight • Basic detection</p>
+        </div>
+        <div class="model-option" data-model="nexus_large">
+          <h4>Nexus Large</h4>
+          <p>Advanced • High accuracy • Deep analysis</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Platform Selector -->
+    <div class="platform-selector">
+      <button class="platform-btn active" onclick="selectPlatform('instagram', this)">
+        <i class="fab fa-instagram"></i> Instagram
+      </button>
+      <button class="platform-btn" onclick="selectPlatform('telegram', this)">
+        <i class="fab fa-telegram"></i> Telegram
+      </button>
+      <button class="platform-btn" onclick="selectPlatform('whatsapp', this)">
+        <i class="fab fa-whatsapp"></i> WhatsApp
+      </button>
+    </div>
+
+    <!-- Platform Description -->
+    <div class="platform-description">
+      <i id="platform-icon" class="fab fa-instagram"></i>
+      <div>
+        <h3 id="platform-title">Instagram Monitoring</h3>
+        <p id="platform-desc">Scan posts, stories, and DMs for drug-related content.</p>
+      </div>
+    </div>
+
+    <!-- Instagram Interface -->
+    <div id="instagram-interface" class="scan-interface">
+      <div class="grid-3">
+        <!-- Posts Scanning -->
+        <div class="card hashtag-card">
+          <h3><i class="fas fa-hashtag"></i> Instagram Post Analysis</h3>
+          <p>Scan public posts and hashtags for drug-related activity with precision.</p>
+          <div class="form-group">
+            <input
+              type="text"
+              class="form-input"
+              placeholder="Enter hashtag (e.g., #weed)"
+              id="instagram-posts-input"
+            />
+            <div class="error-message" id="instagram-posts-error">Please enter a hashtag</div>
+          </div>
+          <div class="hashtag-suggestions">
+            <span onclick="fillHashtag('#weed')">#weed</span>
+            <span onclick="fillHashtag('#cocaine')">#cocaine</span>
+            <span onclick="fillHashtag('#mdma')">#mdma</span>
+            <span onclick="fillHashtag('#lsd')">#lsd</span>
+            <span onclick="fillHashtag('#xanax')">#xanax</span>
+            <span onclick="fillHashtag('#ketamine')">#ketamine</span>
+            <span onclick="fillHashtag('#heroin')">#heroin</span>
+            <span onclick="fillHashtag('#ganja')">#ganja</span>
+            <span onclick="fillHashtag('#hash')">#hash</span>
+            <span onclick="fillHashtag('#ecstasy')">#ecstasy</span>
+            <span onclick="fillHashtag('#meth')">#meth</span>
+            <span onclick="fillHashtag('#opium')">#opium</span>
+            <span onclick="fillHashtag('#fentanyl')">#fentanyl</span>
+            <span onclick="fillHashtag('#percocet')">#percocet</span>
+            <span onclick="fillHashtag('#oxy')">#oxy</span>
+          </div>
+          <button class="btn btn-primary btn-full" onclick="startScan('instagram', 'hashtag', 'instagram-posts-input')">
+            <i class="fas fa-search"></i> Scan Posts
+          </button>
+        </div>
+
+        <!-- DM Scanning -->
+        <div class="card">
+          <h3><i class="fas fa-comment"></i> DM Scanning</h3>
+          <p>Analyze direct message conversations for suspicious activity.</p>
+          <div id="instagram-dms-targets" class="target-list hidden"></div>
+          <button class="btn btn-secondary btn-full" onclick="fetchTargets('instagram', 'dms')">
+            <i class="fas fa-sync"></i> Load DMs
+          </button>
+        </div>
+      </div>
+
+      <!-- Hashtag History -->
+      <div class="hashtag-history" id="hashtag-history">
+        <h3><i class="fas fa-history"></i> Scanned Hashtags</h3>
+        <ul id="hashtag-history-list"></ul>
+      </div>
+    </div>
+
+    <!-- Telegram Interface -->
+    <div id="telegram-interface" class="scan-interface hidden">
+      <div class="grid-1">
+        <div class="card">
+          <h3><i class="fas fa-users"></i> Group & Channel Monitoring</h3>
+          <p>Monitor public groups and channels for drug-related content.</p>
+          <div id="telegram-groups-targets" class="target-list hidden"></div>
+          <button class="btn btn-secondary btn-full" onclick="fetchTargets('telegram', 'group')">
+            <i class="fas fa-sync"></i> Load Groups
+          </button>
+          <div class="form-group">
+            <textarea class="form-input form-textarea" placeholder="Add keywords (optional, e.g., drug, sale)" id="telegram-keywords"></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- WhatsApp Interface -->
+    <div id="whatsapp-interface" class="scan-interface hidden">
+      <div class="grid-1">
+        <div class="card">
+          <h3><i class="fas fa-upload"></i> WhatsApp Analysis</h3>
+          <p>Upload exported chat files for analysis.</p>
+          <div class="file-upload" onclick="document.getElementById('whatsapp-file').click()">
+            <i class="fas fa-upload"></i>
+            <h4>Upload Chat Export</h4>
+            <p>Drag .txt, .pdf, .docx, .csv, .json or click to browse</p>
+            <button class="btn btn-accent">Choose File</button>
+          </div>
+          <input type="file" id="whatsapp-file" class="file-input" accept=".txt,.pdf,.docx,.csv,.json" onchange="handleFileUpload(event)">
+          <div id="file-info" class="file-info hidden">
+            <i class="fas fa-file-alt"></i>
+            <div>
+              <div id="file-name" style="color: var(--text-primary); font-weight: 600;"></div>
+              <div id="file-size" style="color: var(--text-secondary); font-size: 0.9rem;"></div>
+            </div>
+          </div>
+          <div class="form-group">
+            <textarea class="form-input form-textarea" placeholder="Keywords (optional, e.g., drug, sale)" id="whatsapp-keywords"></textarea>
+          </div>
+          <button class="btn btn-accent btn-full" id="whatsapp-scan-btn" onclick="startScan('whatsapp', 'file', null)" disabled>
+            <i class="fas fa-search"></i> Analyze
+          </button>
+          <div class="instructions">
+            <h4>Export Steps</h4>
+            <ol>
+              <li>Open WhatsApp chat</li>
+              <li>Go to Menu → Export chat → Without media</li>
+              <li>Email or save the .txt file</li>
+              <li>Upload the file here</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scan Results -->
+    <div id="scan-results" class="scan-results hidden">
+      <div class="results-header">
+        <i class="fas fa-check-circle"></i>
+        <div>
+          <h3 id="results-title">Scan Results</h3>
+          <div class="results-meta" id="results-meta">Completed on <span id="scan-timestamp"></span></div>
+        </div>
+      </div>
+      <div class="results-grid">
+        <div class="result-stat">
+          <div class="result-value total" id="total-messages">0</div>
+          <div class="result-label">Total Messages</div>
+        </div>
+        <div class="result-stat">
+          <div class="result-value threats" id="threats-detected">0</div>
+          <div class="result-label">Threats</div>
+        </div>
+        <div class="result-stat">
+          <div class="result-value suspicious" id="suspicious-activities">0</div>
+          <div class="result-label">Suspicious</div>
+        </div>
+        <div class="result-stat">
+          <div class="result-value clean" id="clean-messages">0</div>
+          <div class="result-label">Clean</div>
+        </div>
+      </div>
+      <div class="result-badges">
+        <div class="badge badge-success" id="scan-time-badge">0s</div>
+        <div class="badge badge-danger hidden" id="alert-badge">
+          <i class="fas fa-exclamation-triangle"></i> High Risk
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading Overlay -->
+  <div class="loading-overlay" id="loading-overlay">
+    <div class="spinner"></div>
+    <span>Processing Scan...</span>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="toast"></div>
+
+  <footer>
+    © 2025 Nexus Clean - Advanced Drug Detection. All rights reserved.
+  </footer>
+
+  <script>
+    let token = localStorage.getItem('jwt');
+    let currentScanId = null;
+    let evtSource = null;
+    let uploadedFile = null;
+    let selectedModel = 'nexus_small';
+    let loadedTabs = new Set();
+    let hashtagHistory = JSON.parse(localStorage.getItem('hashtagHistory')) || [];
+
+    if (!token) window.location.href = '/';
+
+    const authFetch = (url, options = {}) => {
+      return fetch(url, {
+        ...options,
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+          ...options.headers
+        }
+      });
+    };
+
+    // Model Selection
+    document.querySelectorAll('.model-option').forEach(opt => {
+      opt.addEventListener('click', () => {
+        document.querySelectorAll('.model-option').forEach(o => o.classList.remove('selected'));
+        opt.classList.add('selected');
+        selectedModel = opt.dataset.model;
+        showToast(`Selected Model: Nexus ${selectedModel === 'nexus_small' ? 'Small' : 'Large'}`, 'success');
+      });
+    });
+
+    // Platform Switch
+    function selectPlatform(platform, btn) {
+      document.querySelectorAll('.platform-btn').forEach(b => b.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+
+      document.querySelectorAll('.scan-interface').forEach(i => i.classList.add('hidden'));
+      document.getElementById(`${platform}-interface`).classList.remove('hidden');
+
+      const platformData = {
+        instagram: { icon: 'fab fa-instagram', title: 'Instagram Monitoring', desc: 'Scan posts, stories, and DMs for drug-related content.' },
+        telegram: { icon: 'fab fa-telegram', title: 'Telegram Tracking', desc: 'Monitor public groups and channels.' },
+        whatsapp: { icon: 'fab fa-whatsapp', title: 'WhatsApp Analysis', desc: 'Analyze uploaded chat files for suspicious activity.' }
+      };
+      const pd = platformData[platform];
+      document.getElementById('platform-icon').className = pd.icon;
+      document.getElementById('platform-title').textContent = pd.title;
+      document.getElementById('platform-desc').textContent = pd.desc;
+
+      if (!loadedTabs.has(platform)) {
+        loadedTabs.add(platform);
+      }
+
+      if (platform === 'instagram') {
+        updateHashtagHistory();
+      }
+    }
+
+    // Fetch Targets
+    async function fetchTargets(platform, scanType) {
+      const containerId = platform === 'instagram' ? 'instagram-dms-targets' : 'telegram-groups-targets';
+      const container = document.getElementById(containerId);
+      const btn = event.target;
+      const orig = btn.innerHTML;
+      btn.innerHTML = '<div class="spinner"></div> Loading...';
+      btn.disabled = true;
+
+      try {
+        const res = await authFetch(`/api/${platform}/${scanType === 'dms' ? 'dms' : 'groups'}`);
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed to load targets');
+
+        container.innerHTML = '';
+        if (data.length === 0) {
+          container.innerHTML = '<small style="color: var(--text-secondary);">No items found</small>';
+        } else {
+          data.slice(0, 50).forEach(item => {
+            const div = document.createElement('div');
+            div.className = 'target-item';
+            div.innerHTML = `
+              <input type="checkbox" value="${item.id}" id="${platform}-${item.id}">
+              <label for="${platform}-${item.id}">${item.username || item.title || 'Unknown'}</label>
+            `;
+            container.appendChild(div);
+          });
+
+          const scanBtn = document.createElement('button');
+          scanBtn.className = 'btn btn-primary btn-full';
+          scanBtn.innerHTML = '<i class="fas fa-play"></i> Start Scan';
+          scanBtn.onclick = () => startScan(platform, scanType);
+          container.appendChild(scanBtn);
+        }
+        container.classList.remove('hidden');
+      } catch (err) {
+        container.innerHTML = '<small style="color: var(--error);">Failed to load: ' + err.message + '</small>';
+        showToast(err.message, 'error');
+      } finally {
+        btn.innerHTML = orig;
+        btn.disabled = false;
+      }
+    }
+
+    // Get Selected Targets
+    function getSelectedTargets() {
+      const platform = document.querySelector('.platform-btn.active').textContent.trim().toLowerCase();
+      const containerId = platform === 'instagram' ? 'instagram-dms-targets' : 'telegram-groups-targets';
+      return Array.from(document.querySelectorAll(`#${containerId} input:checked`)).map(cb => cb.value);
+    }
+
+    // Update Hashtag History
+    function updateHashtagHistory() {
+      const historyList = document.getElementById('hashtag-history-list');
+      historyList.innerHTML = '';
+      hashtagHistory.forEach(item => {
+        const li = document.createElement('li');
+        const resultsText = item.status === 'completed' && item.results
+          ? `Total: ${item.results.total_messages}, Threats: ${item.results.threats_detected}, Suspicious: ${item.results.suspicious_activities}`
+          : '';
+        li.innerHTML = `
+          ${item.hashtag} (${item.timestamp})
+          <div>
+            <span class="results">${resultsText}</span>
+            <span class="status ${item.status}">${item.status.charAt(0).toUpperCase() + item.status.slice(1)}</span>
+          </div>
+        `;
+        historyList.appendChild(li);
+      });
+      document.getElementById('hashtag-history').classList.remove('hidden');
+    }
+
+    // Add Hashtag to History
+    function addHashtagToHistory(hashtag, status = 'pending', results = null) {
+      hashtagHistory.unshift({
+        hashtag,
+        status,
+        timestamp: new Date().toLocaleString(),
+        results
+      });
+      hashtagHistory = hashtagHistory.slice(0, 10);
+      localStorage.setItem('hashtagHistory', JSON.stringify(hashtagHistory));
+      updateHashtagHistory();
+    }
+
+    // Start Scan
+    async function startScan(platform, scanType, inputId, selected = null, keywords = '') {
+      if (currentScanId) return showToast('A scan is already in progress', 'error');
+      if (inputId && !validateInput(inputId)) return;
+      if (platform === 'whatsapp' && !uploadedFile) return showToast('Please upload a file', 'error');
+
+      const button = event.target;
+      const originalHTML = button.innerHTML;
+      button.innerHTML = '<i class="spinner"></i> Starting Scan...';
+      button.disabled = true;
+      document.getElementById('loading-overlay').classList.add('active');
+
+      // Reset UI
+      document.getElementById('live-messages').innerHTML = '';
+      document.getElementById('live-stats').innerHTML = '';
+      document.getElementById('scan-results').classList.add('hidden');
+      document.getElementById('live-scan-container').classList.remove('hidden');
+      document.getElementById('live-scan-container').scrollIntoView({ behavior: 'smooth' });
+
+      let hashtag = null;
+      if (platform === 'instagram' && scanType === 'hashtag') {
+        hashtag = document.getElementById(inputId).value.trim();
+        addHashtagToHistory(hashtag, 'running');
+      }
+
+      try {
+        const formData = new FormData();
+        formData.append('platform', platform);
+        formData.append('scan_type', scanType);
+        formData.append('model', selectedModel);
+        if (inputId) formData.append('target', document.getElementById(inputId).value.trim());
+        if (selected || getSelectedTargets().length > 0) {
+          formData.append('selected', JSON.stringify(selected || getSelectedTargets()));
+        }
+        if (keywords) formData.append('keywords', keywords);
+        if (uploadedFile) formData.append('file', uploadedFile);
+
+        const res = await fetch('/api/scan', {
+          method: 'POST',
+          headers: { 'Authorization': `Bearer ${token}` },
+          body: formData
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Failed to start scan');
+
+        currentScanId = data.scan_id;
+        showToast('Scan started! Live updates below.', 'success');
+        startLiveStream(currentScanId, platform, scanType, hashtag);
+      } catch (err) {
+        if (hashtag) {
+          hashtagHistory = hashtagHistory.map(item =>
+            item.hashtag === hashtag ? { ...item, status: 'failed' } : item
+          );
+          localStorage.setItem('hashtagHistory', JSON.stringify(hashtagHistory));
+          updateHashtagHistory();
+        }
+        showToast(err.message, 'error');
+      } finally {
+        button.innerHTML = originalHTML;
+        button.disabled = false;
+        document.getElementById('loading-overlay').classList.remove('active');
+      }
+    }
+
+    // LIVE STREAMING
+    function startLiveStream(scanId, platform, scanType, hashtag) {
+      if (evtSource) evtSource.close();
+
+      const url = `/api/scan/${scanId}/stream`;
+      evtSource = new EventSource(url);
+
+      let messageCount = 0;
+      let threatCount = 0;
+      let startTime = Date.now();
+
+      evtSource.onopen = () => {
+        console.log("Live stream connected");
+      };
+
+      evtSource.onmessage = (e) => {
+        const data = JSON.parse(e.data);
+
+        if (data.type === 'message') {
+          messageCount++;
+          const msg = data.data;
+          appendLiveMessage(msg);
+          updateLiveStats(messageCount, threatCount, startTime);
+        }
+        else if (data.type === 'complete') {
+          finalizeScan(scanId, platform, scanType, hashtag, messageCount);
+        }
+        else if (data.type === 'error') {
+          showToast(`Error: ${data.data}`, 'error');
+        }
+        else if (data.type === 'log') {
+          console.log("Log:", data.data);
+        }
+      };
+
+      evtSource.onerror = (err) => {
+        console.error("SSE Error:", err);
+        evtSource.close();
+        showToast("Live stream disconnected", 'error');
+        finalizeScan(scanId, platform, scanType, hashtag, messageCount, true);
+      };
+    }
+
+    // Append Message to Live Feed
+    function appendLiveMessage(msg) {
+      const container = document.getElementById('live-messages');
+      const div = document.createElement('div');
+      div.className = 'live-message';
+
+      const sender = msg.sender || 'Unknown';
+      const text = msg.message || '';
+      const time = new Date(msg.timestamp).toLocaleTimeString();
+
+      div.innerHTML = `
+        <div class="msg-header">
+          <strong>${sender}</strong>
+          <span class="time">${time}</span>
+        </div>
+        <div class="msg-text">${text.substring(0, 300)}${text.length > 300 ? '...' : ''}</div>
+      `;
+
+      container.appendChild(div);
+      container.scrollTop = container.scrollHeight;
+    }
+
+    // Update Live Stats
+    function updateLiveStats(messages, threats, startTime) {
+      const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
+      document.getElementById('live-stats').innerHTML = `
+        <div class="stat"><strong>Messages:</strong> ${messages}</div>
+        <div class="stat"><strong>Time:</strong> ${elapsed}s</div>
+        <div class="stat"><strong>Rate:</strong> ${(messages / (elapsed || 1)).toFixed(1)}/s</div>
+      `;
+    }
+
+    // Finalize Scan
+    async function finalizeScan(scanId, platform, scanType, hashtag, messageCount, failed = false) {
+      if (evtSource) {
+        evtSource.close();
+        evtSource = null;
+      }
+
+      try {
+        const res = await authFetch('/api/scan_history');
+        const history = await res.json();
+        const scan = history.find(s => s.id === scanId);
+        if (!scan) throw new Error("Scan not found in history");
+
+        displayResults(scan);
+        showToast(
+          failed ? 'Scan failed' : `Scan complete! ${scan.threats_detected} threats found.`,
+          failed ? 'error' : 'success'
+        );
+
+        if (hashtag) {
+          hashtagHistory = hashtagHistory.map(item =>
+            item.hashtag === hashtag ? {
+              ...item,
+              status: scan.status,
+              results: {
+                total_messages: scan.total_messages,
+                threats_detected: scan.threats_detected,
+                suspicious_activities: scan.suspicious_activities,
+                clean_messages: scan.clean_messages
+              }
+            } : item
+          );
+          localStorage.setItem('hashtagHistory', JSON.stringify(hashtagHistory));
+          updateHashtagHistory();
+        }
+
+      } catch (err) {
+        showToast("Failed to load final results", 'error');
+      } finally {
+        currentScanId = null;
+        document.getElementById('live-scan-container').classList.add('hidden');
+      }
+    }
+
+    // Display Final Results
+    function displayResults(scan) {
+      document.getElementById('results-title').textContent = `Results - ${scan.platform.charAt(0).toUpperCase() + scan.platform.slice(1)} ${scan.scan_type === 'hashtag' ? `(${scan.target})` : ''}`;
+      document.getElementById('scan-timestamp').textContent = new Date(scan.timestamp).toLocaleString();
+      document.getElementById('total-messages').textContent = scan.total_messages || 0;
+      document.getElementById('threats-detected').textContent = scan.threats_detected || 0;
+      document.getElementById('suspicious-activities').textContent = scan.suspicious_activities || 0;
+      document.getElementById('clean-messages').textContent = scan.clean_messages || 0;
+      document.getElementById('scan-time-badge').textContent = `${Math.round(scan.scan_time || 0)}s`;
+
+      const alert = document.getElementById('alert-badge');
+      if (scan.threats_detected > 0) {
+        alert.classList.remove('hidden');
+        alert.innerHTML = `<i class="fas fa-exclamation-triangle"></i> ${scan.risk_level.charAt(0).toUpperCase() + scan.risk_level.slice(1)} Risk`;
+      } else {
+        alert.classList.add('hidden');
+      }
+
+      document.getElementById('scan-results').classList.remove('hidden');
+      document.getElementById('scan-results').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // Toast Notification
+    function showToast(message, type = 'success') {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.className = `toast ${type}`;
+      toast.style.display = 'block';
+      setTimeout(() => { toast.style.display = 'none'; }, 3000);
+    }
+
+    // Input Validation
+    function validateInput(inputId) {
+      const input = document.getElementById(inputId);
+      const error = document.getElementById(inputId.replace('-input', '-error'));
+      if (!input.value.trim()) {
+        input.classList.add('error');
+        error.classList.add('show');
+        return false;
+      }
+      input.classList.remove('error');
+      error.classList.remove('show');
+      return true;
+    }
+
+    // File Upload Handling
+    function handleFileUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      uploadedFile = file;
+      const info = document.getElementById('file-info');
+      info.classList.remove('hidden');
+      document.getElementById('file-name').textContent = file.name;
+      document.getElementById('file-size').textContent = `${(file.size / 1024).toFixed(2)} KB`;
+      document.getElementById('whatsapp-scan-btn').disabled = false;
+      showToast(`File uploaded: ${file.name}`, 'success');
+    }
+
+    // Fill Hashtag Input
+    function fillHashtag(tag) {
+      document.getElementById('instagram-posts-input').value = tag;
+      showToast(`Selected hashtag: ${tag}`, 'success');
+    }
+
+    // Logout
+    document.getElementById('logout-link').addEventListener('click', e => {
+      e.preventDefault();
+      localStorage.removeItem('jwt');
+      window.location.href = '/';
+    });
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', () => {
+      const defaultBtn = document.querySelector('.platform-btn.active');
+      if (defaultBtn) selectPlatform('instagram', defaultBtn);
+      updateHashtagHistory();
+    });
+</script>
+</body>
+</html>

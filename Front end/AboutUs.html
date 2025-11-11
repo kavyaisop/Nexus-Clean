@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>About Us - Nexus Clean</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    />
+    <style>
+      :root {
+        --bg-primary: #0f1419;
+        --bg-secondary: #1a2332;
+        --bg-card: #243447;
+        --bg-accent: #2d4059;
+        --text-primary: #ffffff;
+        --text-secondary: #e2e8f0;
+        --accent-1: #00bcd4;
+        --accent-2: #4fc3f7;
+        --accent-3: #ff7043;
+        --border-color: #334155;
+        --shadow: rgba(0, 0, 0, 0.3);
+        --glow: rgba(0, 188, 212, 0.3);
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        transition: all 0.3s ease;
+      }
+
+      body {
+        background: var(--bg-primary);
+        font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        color: var(--text-primary);
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+        overflow-x: hidden;
+      }
+
+      nav {
+        width: 100%;
+        background: var(--bg-secondary);
+        padding: 15px 30px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 2px 10px var(--shadow);
+        border-bottom: 1px solid var(--border-color);
+        z-index: 100;
+      }
+
+      nav h1 {
+        font-size: 1.8rem;
+        color: var(--text-primary);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-weight: 600;
+      }
+
+      .nav-links {
+        list-style: none;
+        display: flex;
+        gap: 30px;
+        align-items: center;
+      }
+
+      .nav-links li a {
+        text-decoration: none;
+        font-weight: 500;
+        color: var(--text-secondary);
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 16px;
+        border-radius: 6px;
+        font-size: 0.95rem;
+      }
+
+      .nav-links li a:hover {
+        color: var(--accent-1);
+        background: rgba(255, 255, 255, 0.05);
+      }
+
+      .nav-links li a.active {
+        color: var(--accent-1);
+        background: rgba(255, 255, 255, 0.05);
+      }
+
+      .main {
+        flex: 1;
+        padding: 40px 30px;
+        max-width: 1200px;
+        margin: 0 auto;
+        width: 100%;
+      }
+
+      .hero {
+        text-align: center;
+        margin-bottom: 60px;
+      }
+
+      .hero-icon {
+        width: 120px;
+        height: 120px;
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 30px;
+        box-shadow: 0 4px 15px var(--shadow);
+      }
+
+      .hero-icon i {
+        font-size: 3.5rem;
+        color: var(--accent-1);
+      }
+
+      .hero h1 {
+        font-size: 3.5rem;
+        font-weight: 700;
+        margin-bottom: 20px;
+        line-height: 1.2;
+      }
+
+      .hero .subtitle {
+        color: var(--accent-1);
+        font-size: 2rem;
+        font-weight: 600;
+        margin-bottom: 25px;
+      }
+
+      .hero p {
+        font-size: 1.2rem;
+        color: var(--text-secondary);
+        max-width: 800px;
+        margin: 0 auto;
+        line-height: 1.6;
+      }
+
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 30px;
+        margin-bottom: 80px;
+      }
+
+      .stat-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 30px;
+        text-align: center;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 8px var(--shadow);
+      }
+
+      .stat-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 4px 20px rgba(0, 188, 212, 0.15);
+      }
+
+      .stat-value {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--accent-1);
+        margin-bottom: 10px;
+      }
+
+      .stat-label {
+        font-size: 1rem;
+        color: var(--text-secondary);
+        font-weight: 500;
+      }
+
+      .features-section {
+        margin-bottom: 80px;
+      }
+
+      .section-header {
+        text-align: center;
+        margin-bottom: 50px;
+      }
+
+      .section-header h2 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 15px;
+      }
+
+      .section-header p {
+        font-size: 1.1rem;
+        color: var(--text-secondary);
+        max-width: 600px;
+        margin: 0 auto;
+        line-height: 1.6;
+      }
+
+      .features-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+        gap: 30px;
+      }
+
+      .feature-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 30px;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 8px var(--shadow);
+      }
+
+      .feature-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 4px 20px rgba(0, 188, 212, 0.15);
+      }
+
+      .feature-icon {
+        width: 60px;
+        height: 60px;
+        background: var(--bg-accent);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 20px;
+      }
+
+      .feature-icon i {
+        font-size: 1.8rem;
+        color: var(--accent-2);
+      }
+
+      .feature-card h3 {
+        font-size: 1.3rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 15px;
+      }
+
+      .feature-card p {
+        color: var(--text-secondary);
+        line-height: 1.6;
+      }
+
+      .process-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 30px;
+        position: relative;
+      }
+
+      .process-step {
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 25px;
+        text-align: center;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 8px var(--shadow);
+        position: relative;
+      }
+
+      .process-step:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 4px 20px rgba(0, 188, 212, 0.15);
+      }
+
+      .step-number {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--accent-1);
+        margin-bottom: 15px;
+      }
+
+      .process-step h3 {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 12px;
+      }
+
+      .process-step p {
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+        line-height: 1.5;
+      }
+
+      .mission-section {
+        background: linear-gradient(135deg, var(--bg-accent), var(--bg-card));
+        border: 1px solid var(--border-color);
+        border-radius: 20px;
+        padding: 50px;
+        text-align: center;
+        margin-bottom: 60px;
+        box-shadow: 0 4px 15px var(--shadow);
+      }
+
+      .mission-icon {
+        font-size: 4rem;
+        color: var(--accent-1);
+        margin-bottom: 25px;
+      }
+
+      .mission-section h2 {
+        font-size: 2.2rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 25px;
+      }
+
+      .mission-section p {
+        font-size: 1.1rem;
+        color: var(--text-secondary);
+        line-height: 1.6;
+        max-width: 800px;
+        margin: 0 auto 25px;
+      }
+
+      .mission-quote {
+        background: rgba(15, 20, 25, 0.5);
+        border: 1px solid var(--border-color);
+        border-radius: 12px;
+        padding: 25px;
+        margin-top: 30px;
+      }
+
+      .mission-quote p {
+        color: var(--accent-2);
+        font-weight: 600;
+        font-style: italic;
+        margin: 0;
+      }
+
+      .toast {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        padding: 12px 24px;
+        border-radius: 10px;
+        font-size: 0.95rem;
+        font-weight: 500;
+        color: white;
+        display: none;
+        z-index: 1000;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        animation: slideInRight 0.4s ease-out;
+      }
+
+      .toast.success { background: var(--accent-1); }
+      .toast.error { background: var(--accent-3); }
+
+      @keyframes slideInRight {
+        from { opacity: 0; transform: translateX(100%); }
+        to { opacity: 1; transform: translateX(0); }
+      }
+
+      footer {
+        background: var(--bg-secondary);
+        text-align: center;
+        padding: 25px;
+        font-size: 0.9rem;
+        border-top: 1px solid var(--border-color);
+        color: var(--text-secondary);
+      }
+
+      @media (max-width: 768px) {
+        .main { padding: 30px 20px; }
+        nav { padding: 15px 20px; flex-direction: column; gap: 15px; }
+        .nav-links { gap: 20px; flex-wrap: wrap; justify-content: center; }
+        .hero h1 { font-size: 2.5rem; }
+        .hero .subtitle { font-size: 1.5rem; }
+        .features-grid { grid-template-columns: 1fr; }
+        .mission-section { padding: 30px 20px; }
+      }
+
+      @keyframes slideIn {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+
+      .animate-in { animation: slideIn 0.6s ease-out; }
+    </style>
+  </head>
+  <body class="animate-in">
+    <nav>
+      <h1><i class="fas fa-shield-alt"></i> Nexus Clean</h1>
+      <ul class="nav-links">
+        <li><a href="/dashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+        <li><a href="/livescan"><i class="fas fa-search"></i> Live Scan</a></li>
+        <li><a href="/scanhistory"><i class="fas fa-chart-line"></i> Scan History</a></li>
+        <li><a href="/map"><i class="fas fa-location-dot"></i> Track User</a></li>
+        <li><a href="/aboutus" class="active"><i class="fas fa-info-circle"></i> About Us</a></li>
+        <li><a href="#" id="logout-link"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+      </ul>
+    </nav>
+
+    <div class="main">
+      <section class="hero">
+        <div class="hero-icon"><i class="fas fa-shield-alt"></i></div>
+        <h1>Advanced Drug Detection</h1>
+        <div class="subtitle">Technology</div>
+        <p>
+          Nexus Clean is a cutting-edge AI-powered platform that monitors social
+          media networks to detect and prevent illegal drug activities, keeping
+          communities safe through advanced technology.
+        </p>
+      </section>
+
+      <section class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-value" id="detection-accuracy">98.7%</div>
+          <div class="stat-label">Detection Accuracy</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="platforms-monitored">15+</div>
+          <div class="stat-label">Platforms Monitored</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="daily-scans">50K+</div>
+          <div class="stat-label">Daily Scans</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="response-time">&lt;0.3s</div>
+          <div class="stat-label">Response Time</div>
+        </div>
+      </section>
+
+      <section class="features-section">
+        <div class="section-header">
+          <h2>Why Choose Nexus Clean?</h2>
+          <p>
+            Our platform combines state-of-the-art technology with proven
+            methodologies to deliver unmatched drug detection capabilities.
+          </p>
+        </div>
+
+        <div class="features-grid">
+          <div class="feature-card">
+            <div class="feature-icon"><i class="fas fa-brain"></i></div>
+            <h3>Advanced AI Detection</h3>
+            <p>
+              Our machine learning algorithms achieve 98.7% accuracy in
+              identifying drug-related content across social platforms.
+            </p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon"><i class="fas fa-eye"></i></div>
+            <h3>Real-Time Monitoring</h3>
+            <p>
+              Continuous scanning of posts, messages, and conversations with
+              instant alert generation for suspicious activities.
+            </p>
+          </div>
+
+          <div class="feature-card">
+            <div class="feature-icon"><i class="fas fa-globe"></i></div>
+            <h3>Multi-Platform Coverage</h3>
+            <p>
+              Comprehensive monitoring across Instagram, Telegram, WhatsApp, and
+              other major social media platforms.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="features-section">
+        <div class="section-header">
+          <h2>How It Works</h2>
+          <p>
+            Our four-step process ensures comprehensive monitoring and rapid
+            threat detection across all social media platforms.
+          </p>
+        </div>
+
+        <div class="process-grid">
+          <div class="process-step">
+            <div class="step-number">01</div>
+            <h3>Data Collection</h3>
+            <p>
+              Our system securely monitors authorized social media content using
+              advanced web scraping and API integration.
+            </p>
+          </div>
+
+          <div class="process-step">
+            <div class="step-number">02</div>
+            <h3>AI Analysis</h3>
+            <p>
+              Machine learning models trained on drug-related terminology and
+              behavioral patterns analyze the collected data.
+            </p>
+          </div>
+
+          <div class="process-step">
+            <div class="step-number">03</div>
+            <h3>Threat Detection</h3>
+            <p>
+              Sophisticated algorithms identify potential drug-related
+              activities, transactions, and distribution networks.
+            </p>
+          </div>
+
+          <div class="process-step">
+            <div class="step-number">04</div>
+            <h3>Alert Generation</h3>
+            <p>
+              Immediate notifications are sent to law enforcement and monitoring
+              teams when threats are detected.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="mission-section">
+        <i class="fas fa-users mission-icon"></i>
+        <h2>Our Mission</h2>
+        <p>
+          At Nexus Clean, we're committed to making the digital world safer by
+          leveraging artificial intelligence to detect and prevent illegal drug
+          activities on social media platforms. Our advanced monitoring system
+          helps law enforcement agencies, educational institutions, and
+          communities stay one step ahead of drug-related threats.
+        </p>
+        <div class="mission-quote">
+          <p>
+            "Technology for a safer tomorrow - protecting communities through
+            intelligent monitoring and rapid response."
+          </p>
+        </div>
+      </section>
+    </div>
+
+    <footer>
+      © 2025 Nexus Clean - Drug Detection Dashboard. Advanced AI-Powered
+      Social Media Monitoring System. All rights reserved.
+    </footer>
+
+    <div id="toast" class="toast"></div>
+
+    <script>
+      // === JWT GUARD: Redirect if no token ===
+      if (!localStorage.getItem('jwt')) {
+        window.location.href = '/';
+      }
+
+      // === API Helper with JWT ===
+      async function api(url, options = {}) {
+        const token = localStorage.getItem('jwt');
+        const headers = { ...options.headers, Authorization: `Bearer ${token}` };
+        const res = await fetch(url, { ...options, headers });
+        if (res.status === 401) {
+          localStorage.removeItem('jwt');
+          window.location.href = '/';
+        }
+        return res;
+      }
+
+      function showToast(message, type = 'error') {
+        const toast = document.getElementById("toast");
+        toast.textContent = message;
+        toast.className = `toast ${type}`;
+        toast.style.display = "block";
+        setTimeout(() => toast.style.display = "none", 4000);
+      }
+
+      // === Logout ===
+      document.getElementById("logout-link").addEventListener('click', (e) => {
+        e.preventDefault();
+        localStorage.removeItem('jwt');
+        window.location.href = '/';
+      });
+
+      // === Fetch Dynamic Stats ===
+      async function fetchPlatformStats() {
+        try {
+          const res = await api('/api/platform_stats');
+          if (!res.ok) throw new Error('Failed to fetch stats');
+          const data = await res.json();
+
+          document.getElementById('detection-accuracy').textContent = data.detection_accuracy + '%';
+          document.getElementById('platforms-monitored').textContent = data.platforms_monitored + '+';
+          document.getElementById('daily-scans').textContent = data.daily_scans + 'K+';
+          document.getElementById('response-time').textContent = '<' + data.response_time + 's';
+        } catch (e) {
+          showToast(e.message || "Stats load failed", "error");
+        }
+      }
+
+      // === Init Animations + Stats ===
+      document.addEventListener("DOMContentLoaded", () => {
+        fetchPlatformStats();
+
+        setTimeout(() => {
+          document.querySelectorAll(".stat-card, .feature-card, .process-step").forEach((card, i) => {
+            setTimeout(() => card.classList.add("animate-in"), i * 100);
+          });
+        }, 300);
+      });
+    </script>
+  </body>
+</html>

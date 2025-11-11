@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Nexus Clean</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg-primary: #0f1419;
+        --bg-secondary: #1a2332;
+        --bg-card: #243447;
+        --accent-1: #00bcd4;
+        --accent-2: #4fc3f7;
+        --text-primary: #ffffff;
+        --text-secondary: #cbd5e1;
+        --border-color: #334155;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Inter", sans-serif;
+      }
+      body {
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--bg-primary);
+        color: var(--text-primary);
+      }
+      .container {
+        position: relative;
+        width: 850px;
+        height: 500px;
+        background: var(--bg-secondary);
+        border-radius: 20px;
+        overflow: hidden;
+        display: flex;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+      }
+      .forms-container {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 50%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.6s ease-in-out;
+      }
+      form {
+        background: var(--bg-card);
+        padding: 40px;
+        border-radius: 15px;
+        width: 85%;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+      }
+      h2 {
+        text-align: center;
+        font-size: 1.8rem;
+        margin-bottom: 10px;
+      }
+      input {
+        padding: 14px;
+        border-radius: 10px;
+        border: 1px solid var(--border-color);
+        background: var(--bg-secondary);
+        color: var(--text-primary);
+        font-size: 1rem;
+        outline: none;
+        transition: border 0.3s;
+      }
+      input:focus {
+        border: 1px solid var(--accent-1);
+      }
+      .error {
+        font-size: 0.85rem;
+        color: #ff6b6b;
+        margin-top: -8px;
+        margin-bottom: 5px;
+      }
+      button {
+        background: var(--accent-1);
+        border: none;
+        color: white;
+        padding: 14px;
+        border-radius: 10px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.3s;
+      }
+      button:hover {
+        background: var(--accent-2);
+      }
+      .panel-container {
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 50%;
+        height: 100%;
+        background: var(--bg-card);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 40px;
+        transition: all 0.6s ease-in-out;
+      }
+      .container.signup-mode .forms-container {
+        transform: translateX(100%);
+      }
+      .container.signup-mode .panel-container {
+        transform: translateX(-100%);
+      }
+      .panel-container h3 {
+        font-size: 1.5rem;
+        margin-bottom: 15px;
+      }
+      .panel-container p {
+        font-size: 0.95rem;
+        color: var(--text-secondary);
+        margin-bottom: 25px;
+      }
+      .panel-container button {
+        background: transparent;
+        border: 2px solid var(--accent-1);
+        color: var(--accent-1);
+        font-weight: 600;
+      }
+      .panel-container button:hover {
+        background: var(--accent-1);
+        color: var(--bg-primary);
+      }
+
+      /* Toast */
+      .toast {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        min-width: 300px;
+        padding: 14px 20px;
+        border-radius: 12px;
+        color: #fff;
+        font-weight: 600;
+        font-size: 0.95rem;
+        box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        opacity: 0;
+        visibility: hidden;
+        transform: translateY(20px);
+        transition: all 0.4s ease;
+        z-index: 1000;
+      }
+      .toast.show {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+      }
+      .toast.success { background: linear-gradient(135deg, #00bcd4, #0097a7); }
+      .toast.error   { background: linear-gradient(135deg, #ff6b6b, #e74c3c); }
+    </style>
+  </head>
+  <body>
+    <div class="container" id="container">
+      <div class="forms-container">
+        <!-- LOGIN FORM -->
+        <form id="loginForm" novalidate>
+          <h2>Login</h2>
+          <input type="email" id="loginEmail" placeholder="Email" />
+          <div id="loginEmailError" class="error"></div>
+          <input type="password" id="loginPassword" placeholder="Password" />
+          <div id="loginPasswordError" class="error"></div>
+          <button type="submit">Login</button>
+        </form>
+
+        <!-- SIGNUP FORM -->
+        <form id="signupForm" style="display: none" novalidate>
+          <h2>Sign Up</h2>
+          <input type="text" id="signupName" placeholder="Full Name" />
+          <div id="signupNameError" class="error"></div>
+          <input type="email" id="signupEmail" placeholder="Email" />
+          <div id="signupEmailError" class="error"></div>
+          <input type="password" id="signupPassword" placeholder="Password" />
+          <div id="signupPasswordError" class="error"></div>
+          <input type="password" id="signupConfirm" placeholder="Confirm Password" />
+          <div id="signupConfirmError" class="error"></div>
+          <button type="submit">Sign Up</button>
+        </form>
+      </div>
+
+      <div class="panel-container" id="panel">
+        <h3 id="panelTitle">New here?</h3>
+        <p id="panelDesc">Sign up to create your account</p>
+        <button id="toggleBtn">Sign Up</button>
+      </div>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <script>
+      const container = document.getElementById("container");
+      const loginForm = document.getElementById("loginForm");
+      const signupForm = document.getElementById("signupForm");
+      const toggleBtn = document.getElementById("toggleBtn");
+      const panelTitle = document.getElementById("panelTitle");
+      const panelDesc = document.getElementById("panelDesc");
+      let signupMode = false;
+
+      // Toggle between Login & Signup
+      toggleBtn.addEventListener("click", () => {
+        signupMode = !signupMode;
+        container.classList.toggle("signup-mode");
+        if (signupMode) {
+          loginForm.style.display = "none";
+          signupForm.style.display = "flex";
+          panelTitle.textContent = "Already a member?";
+          panelDesc.textContent = "Login with your credentials";
+          toggleBtn.textContent = "Login";
+        } else {
+          loginForm.style.display = "flex";
+          signupForm.style.display = "none";
+          panelTitle.textContent = "New here?";
+          panelDesc.textContent = "Sign up to create your account";
+          toggleBtn.textContent = "Sign Up";
+        }
+      });
+
+      // Validation
+      const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+      const validatePassword = (pwd) =>
+        /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/.test(pwd);
+
+      // Toast
+      function showToast(message, type = 'success') {
+        const toast = document.getElementById('toast');
+        toast.textContent = message;
+        toast.className = `toast ${type} show`;
+        setTimeout(() => toast.classList.remove('show'), 3000);
+      }
+
+      // ========== LOGIN ==========
+      loginForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        // Reset errors
+        document.getElementById("loginEmailError").textContent = "";
+        document.getElementById("loginPasswordError").textContent = "";
+
+        const email = document.getElementById("loginEmail").value.trim();
+        const password = document.getElementById("loginPassword").value.trim();
+        let hasError = false;
+
+        if (!email) {
+          document.getElementById("loginEmailError").textContent = "Email is required";
+          hasError = true;
+        } else if (!validateEmail(email)) {
+          document.getElementById("loginEmailError").textContent = "Invalid email format";
+          hasError = true;
+        }
+        if (!password) {
+          document.getElementById("loginPasswordError").textContent = "Password is required";
+          hasError = true;
+        }
+
+        if (hasError) return;
+
+        try {
+          const res = await fetch("/api/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, password })
+          });
+
+          const data = await res.json();
+
+          if (!res.ok) {
+            throw new Error(data.error || "Login failed");
+          }
+
+          // STORE JWT IN localStorage
+          localStorage.setItem('jwt', data.token);
+
+          showToast("Login successful", "success");
+          setTimeout(() => window.location.href = "/dashboard", 800);
+        } catch (err) {
+          showToast(err.message, "error");
+        }
+      });
+
+      // ========== SIGNUP ==========
+      signupForm.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        document.getElementById("signupNameError").textContent = "";
+        document.getElementById("signupEmailError").textContent = "";
+        document.getElementById("signupPasswordError").textContent = "";
+        document.getElementById("signupConfirmError").textContent = "";
+
+        const name = document.getElementById("signupName").value.trim();
+        const email = document.getElementById("signupEmail").value.trim();
+        const password = document.getElementById("signupPassword").value;
+        const confirm = document.getElementById("signupConfirm").value;
+        let hasError = false;
+
+        if (!name) { document.getElementById("signupNameError").textContent = "Full name required"; hasError = true; }
+        if (!email) { document.getElementById("signupEmailError").textContent = "Email required"; hasError = true; }
+        else if (!validateEmail(email)) { document.getElementById("signupEmailError").textContent = "Invalid email"; hasError = true; }
+        if (!password) { document.getElementById("signupPasswordError").textContent = "Password required"; hasError = true; }
+        else if (!validatePassword(password)) {
+          document.getElementById("signupPasswordError").textContent = "≥6 chars, 1 uppercase, 1 number, 1 special";
+          hasError = true;
+        }
+        if (confirm !== password) { document.getElementById("signupConfirmError").textContent = "Passwords do not match"; hasError = true; }
+
+        if (hasError) return;
+
+        try {
+          const res = await fetch("/api/signup", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ name, email, password })
+          });
+
+          const data = await res.json();
+
+          if (!res.ok) throw new Error(data.error || "Signup failed");
+
+          // STORE JWT IN localStorage
+          localStorage.setItem('jwt', data.token);
+
+          showToast("Account created successfully", "success");
+          setTimeout(() => window.location.href = "/dashboard", 800);
+
+        } catch (err) {
+          showToast(err.message, "error");
+        }
+      });
+    </script>
+  </body>
+</html>
